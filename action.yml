@@ -22,3 +22,6 @@ runs:
         echo "$GITHUB_WORKSPACE"
         echo $PWD
       shell: bash
+    - name: "Action dir"
+      run: |
+         echo ${{ github.action_path }}
