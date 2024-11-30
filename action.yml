@@ -1,0 +1,24 @@
+name: 'Gh publish'
+description: 'Publishes artifacts to pypi'
+inputs:
+  publish-config:
+    description: 'Path to the publish config file'
+    required: true
+    default: 'publish-config.yml'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: "Config parser"
+      id: config-parser
+      run: |
+        python3 -m pip install pyyaml
+        python3 config_parser.py "publish-config.yml"
+        ls -lthr
+        echo "$GITHUB_WORKSPACE"
+        echo $PWD
+      shell: bash
