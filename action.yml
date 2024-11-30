@@ -24,4 +24,5 @@ runs:
       shell: bash
     - name: "Action dir"
       run: |
-         echo ${{ github.action_path }}
+        echo ${{ github.action_path }}
+      shell: bash
