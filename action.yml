@@ -23,6 +23,6 @@ runs:
         python-version: '3.9'
 
     - name: "Config parser"
-      uses: ./gh-pub/read-config
+      uses: gopidesupavan/gh-pub/read-config@main
       with:
         publish-config: ${{ inputs.publish-config }}
