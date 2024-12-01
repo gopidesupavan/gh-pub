@@ -30,8 +30,19 @@ runs:
       run: |
         echo "Checking out SVN repo at $repo_url"
         svn co $repo_url
-        cd airflow/providers && echo $PWD
-        ls -lthr
-        echo $PWD
+        echo "SVN repo checked out"
       shell: bash
       working-directory: "./temp-svn-repo"
+
+    - name: SVN check
+      env:
+        FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.extensions) }}
+        PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
+        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.name }}
+        VERSION_FORMAT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.version_pattern }}
+        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.script }}
+      working-directory: ./temp-svn-repo/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
+      run: |
+        echo "Verifying $NAME"
+        python3 $SCRIPT
+      shell: bash
