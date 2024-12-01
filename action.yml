@@ -51,9 +51,11 @@ runs:
         NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.name }}
         VERSION_FORMAT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.version_pattern }}
         SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.script }}
+        enabled: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled }}
       working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
       run: |
         echo "Verifying $NAME"
+        echo "Enabled $enabled"
         python3 $SCRIPT
 
     - name: Checksum check
