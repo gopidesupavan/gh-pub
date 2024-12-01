@@ -21,6 +21,7 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
+
     - name: "Config parser"
       shell: bash
       id: config-parser
@@ -35,7 +36,7 @@ runs:
     - name: Checkout SVN
       shell: bash
       env:
-        repo_url: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.url }}
+        repo_url: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.url }}
       run: |
         echo "Checking out SVN repo at $repo_url"
         svn co $repo_url
@@ -44,15 +45,15 @@ runs:
 
     - name: SVN check
       shell: bash
-      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled == 'true' }}
+      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.enabled == 'true' }}
       env:
-        FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.extensions) }}
-        PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
-        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.name }}
-        VERSION_FORMAT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.version_pattern }}
-        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.script }}
-        enabled: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled }}
-      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
+        FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).publishers.extensions) }}
+        PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.path }}
+        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.name }}
+        VERSION_FORMAT: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.version_pattern }}
+        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.script }}
+        enabled: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.enabled }}
+      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.path }}
       run: |
         echo "Verifying $NAME"
         echo "Enabled $enabled"
@@ -60,12 +61,12 @@ runs:
 
     - name: Checksum check
       shell: bash
-      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.enabled ==  'true' }}
+      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.enabled ==  'true' }}
       env:
-        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.name }}
-        type: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.type }}
-        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.script }}
-      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
+        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.name }}
+        type: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.type }}
+        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.script }}
+      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.path }}
       run: |
         echo "Verifying $NAME"
         chmod +x $SCRIPT
