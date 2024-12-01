@@ -9,6 +9,10 @@ inputs:
     description: 'Temporary directory to checkout svn repo'
     required: false
     default: 'temp-svn-repo'
+  mode:
+    description: 'Mode to run the action'
+    required: false
+    default: 'verify'
 
 runs:
   using: "composite"
@@ -18,6 +22,7 @@ runs:
       with:
         python-version: '3.9'
     - name: "Config parser"
+      shell: bash
       id: config-parser
       env:
         PUBLISH_CONFIG: ${{ inputs.publish-config }}
@@ -26,19 +31,19 @@ runs:
         mkdir -p ${{ inputs.temp-dir }}
         python3 -m pip install pyyaml
         python3 $GITHUB_ACTION_PATH/src/scripts/config_parser.py "${PUBLISH_CONFIG}"
-      shell: bash
 
     - name: Checkout SVN
+      shell: bash
       env:
         repo_url: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.url }}
       run: |
         echo "Checking out SVN repo at $repo_url"
         svn co $repo_url
         echo "SVN repo checked out"
-      shell: bash
       working-directory: "./${{ inputs.temp-dir }}"
 
     - name: SVN check
+      shell: bash
       if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled }} == "true"
       env:
         FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.extensions) }}
@@ -50,9 +55,9 @@ runs:
       run: |
         echo "Verifying $NAME"
         python3 $SCRIPT
-      shell: bash
 
     - name: Checksum check
+      shell: bash
       if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.enabled }} == "true"
       env:
         NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.name }}
@@ -60,7 +65,12 @@ runs:
         SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.script }}
       working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
       run: |
-        echo "Verifying $name"
+        echo "Verifying $NAME"
         chmod +x $SCRIPT
         $SCRIPT "$type"
+
+    - name: Publish to PyPI
       shell: bash
+      if: ${{ inputs.mode }} == "true"
+      run: |
+        echo "TBD Publishing to PyPI"
