@@ -1,0 +1,25 @@
+name: 'Config parser'
+description: 'Parse the publish config file'
+inputs:
+  publish-config:
+    description: 'Path to the publish config file'
+    required: true
+    default: 'publish-config.yml'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: "Config parser"
+      shell: bash
+      id: config-parser
+      env:
+        PUBLISH_CONFIG: ${{ inputs.publish-config }}
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+      run: |
+        python3 -m pip install pyyaml
+        python3 $GITHUB_ACTION_PATH/src/scripts/config_parser.py "${PUBLISH_CONFIG}"

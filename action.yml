@@ -1,4 +1,4 @@
-name: 'Gh publish'
+name: 'Publish to PyPI'
 description: 'Publishes artifacts to pypi'
 inputs:
   publish-config:
@@ -23,57 +23,6 @@ runs:
         python-version: '3.9'
 
     - name: "Config parser"
-      shell: bash
-      id: config-parser
-      env:
-        PUBLISH_CONFIG: ${{ inputs.publish-config }}
-        GITHUB_ACTION_PATH: ${{ github.action_path }}
-      run: |
-        mkdir -p ${{ inputs.temp-dir }}
-        python3 -m pip install pyyaml
-        python3 $GITHUB_ACTION_PATH/src/scripts/config_parser.py "${PUBLISH_CONFIG}"
-
-    - name: Checkout SVN
-      shell: bash
-      env:
-        repo_url: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.url }}
-      run: |
-        echo "Checking out SVN repo at $repo_url"
-        svn co $repo_url
-        echo "SVN repo checked out"
-      working-directory: "./${{ inputs.temp-dir }}"
-
-    - name: SVN check
-      shell: bash
-      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.enabled == 'true' }}
-      env:
-        FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).publishers.extensions) }}
-        PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.path }}
-        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.name }}
-        VERSION_FORMAT: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.version_pattern }}
-        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.script }}
-        enabled: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.svn-check.enabled }}
-      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.path }}
-      run: |
-        echo "Verifying $NAME"
-        echo "Enabled $enabled"
-        python3 $SCRIPT
-
-    - name: Checksum check
-      shell: bash
-      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.enabled ==  'true' }}
-      env:
-        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.name }}
-        type: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.type }}
-        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.rules.checksum-check.script }}
-      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).publishers.path }}
-      run: |
-        echo "Verifying $NAME"
-        chmod +x $SCRIPT
-        $SCRIPT "$type"
-
-    - name: Publish to PyPI
-      shell: bash
-      if: ${{ inputs.mode == 'publish' }}
-      run: |
-        echo "TBD Publishing to PyPI"
+      uses: ./gh-pub/read-config
+      with:
+        publish-config: ${{ inputs.publish-config }}
