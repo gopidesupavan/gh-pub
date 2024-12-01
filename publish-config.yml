@@ -1,6 +1,5 @@
 project:
     Name: example-pub
-    Version: 0.1.0
     Description: Example project for publishing to PyPI
 
 publishers:

@@ -1,0 +1,16 @@
+
+name: Custom Release Publisher
+on:
+  workflow_dispatch:
+
+jobs:
+  parser:
+    runs-on: ubuntu-latest
+    steps:
+     - name: Checkout Code
+       uses: actions/checkout@v3
+
+     - name: CustomPublisher
+       uses: gopidesupavan/gh-pub@main
+       with:
+         publish-config: 'publish-config.yml'
