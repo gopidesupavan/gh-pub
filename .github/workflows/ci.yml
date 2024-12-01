@@ -6,16 +6,16 @@ on:
       - main
 jobs:
   test:
-  runs-on: ubuntu-latest
-  steps:
-    - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-      uses: actions/checkout@v3
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+        uses: actions/checkout@v3
 
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-      python-version: '3.9'
-    - name: "Run tests"
-      run: |
-          python3 -m pip install pytest
-          pytest ./tests
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+        python-version: '3.9'
+      - name: "Run tests"
+        run: |
+            python3 -m pip install pytest
+            pytest ./tests
