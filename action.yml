@@ -44,7 +44,7 @@ runs:
 
     - name: SVN check
       shell: bash
-      if: ${{ steps.config-parser.outputs.pub_config && fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled }}
+      if: ${{ steps.config-parser.outputs.pub_config && fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled == 'true' }}
       env:
         FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.extensions) }}
         PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
