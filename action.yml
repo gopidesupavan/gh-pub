@@ -5,6 +5,10 @@ inputs:
     description: 'Path to the publish config file'
     required: true
     default: 'publish-config.yml'
+  temp-dir:
+    description: 'Temporary directory to checkout svn repo'
+    required: false
+    default: 'temp-svn-repo'
 
 runs:
   using: "composite"
@@ -19,7 +23,7 @@ runs:
         PUBLISH_CONFIG: ${{ inputs.publish-config }}
         GITHUB_ACTION_PATH: ${{ github.action_path }}
       run: |
-        mkdir -p temp-svn-repo
+        mkdir -p ${{ inputs.temp-dir }}
         python3 -m pip install pyyaml
         python3 config_parser.py "publish-config.yml"
       shell: bash
@@ -32,7 +36,7 @@ runs:
         svn co $repo_url
         echo "SVN repo checked out"
       shell: bash
-      working-directory: "./temp-svn-repo"
+      working-directory: "./${{ inputs.temp-dir }}"
 
     - name: SVN check
       env:
@@ -41,7 +45,7 @@ runs:
         NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.name }}
         VERSION_FORMAT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.version_pattern }}
         SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.script }}
-      working-directory: ./temp-svn-repo/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
+      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
       run: |
         echo "Verifying $NAME"
         python3 $SCRIPT
