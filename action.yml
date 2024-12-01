@@ -44,7 +44,7 @@ runs:
 
     - name: SVN check
       shell: bash
-      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled }}
+      if: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled )}} == "true"
       env:
         FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.extensions) }}
         PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
@@ -60,7 +60,7 @@ runs:
 
     - name: Checksum check
       shell: bash
-      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.enabled }}
+      if: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.enabled) }} == "true"
       env:
         NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.name }}
         type: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.type }}
