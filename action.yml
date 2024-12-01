@@ -25,7 +25,7 @@ runs:
       run: |
         mkdir -p ${{ inputs.temp-dir }}
         python3 -m pip install pyyaml
-        python3 config_parser.py "publish-config.yml"
+        python3 $GITHUB_ACTION_PATH/src/scripts/config_parser.py "${PUBLISH_CONFIG}"
       shell: bash
 
     - name: Checkout SVN
@@ -39,6 +39,7 @@ runs:
       working-directory: "./${{ inputs.temp-dir }}"
 
     - name: SVN check
+      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled }} == "true"
       env:
         FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.extensions) }}
         PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
@@ -49,4 +50,17 @@ runs:
       run: |
         echo "Verifying $NAME"
         python3 $SCRIPT
+      shell: bash
+
+    - name: Checksum check
+      if: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.enabled }} == "true"
+      env:
+        NAME: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.name }}
+        type: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.type }}
+        SCRIPT: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.rules.checksum-check.script }}
+      working-directory: ./${{ inputs.temp-dir }}/${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
+      run: |
+        echo "Verifying $name"
+        chmod +x $SCRIPT
+        $SCRIPT "$type"
       shell: bash

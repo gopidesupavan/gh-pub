@@ -60,6 +60,9 @@ def check_files(version_pattern: str, extensions: list[str]):
         exit_code = 1
         print(f"Following files are not matching the extensions: {unknown_file_extensions}")
 
+    if exit_code == 0:
+        print("SVN check passed successfully.")
+
     sys.exit(exit_code)
 
 
@@ -67,5 +70,4 @@ def check_files(version_pattern: str, extensions: list[str]):
 if __name__ == "__main__":
     file_extensions = ast.literal_eval(os.environ.get("FILE_EXTENSIONS"))
     version_format = os.environ.get("VERSION_FORMAT")
-
     check_files(version_format, file_extensions)
