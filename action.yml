@@ -44,7 +44,7 @@ runs:
 
     - name: SVN check
       shell: bash
-      if: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled )}} == "true"
+      if: ${{ steps.config-parser.outputs.pub_config && fromJSON(steps.config-parser.outputs.pub_config).packages.rules.svn-check.enabled }}
       env:
         FILE_EXTENSIONS: ${{ toJson(fromJSON(steps.config-parser.outputs.pub_config).packages.extensions) }}
         PATH: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.path }}
@@ -70,9 +70,3 @@ runs:
         echo "Verifying $NAME"
         chmod +x $SCRIPT
         $SCRIPT "$type"
-
-    - name: Publish to PyPI
-      shell: bash
-      if: ${{ inputs.mode }} == "true"
-      run: |
-        echo "TBD Publishing to PyPI"
