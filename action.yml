@@ -30,6 +30,7 @@ runs:
       run: |
         echo "Checking out SVN repo at $repo_url"
         svn co $repo_url
+        cd airflow/providers && echo $PWD
         ls -lthr
         echo $PWD
       shell: bash
