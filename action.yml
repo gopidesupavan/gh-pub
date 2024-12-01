@@ -15,14 +15,22 @@ runs:
         python-version: '3.9'
     - name: "Config parser"
       id: config-parser
+      env:
+        PUBLISH_CONFIG: ${{ inputs.publish-config }}
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
       run: |
+        mkdir -p temp-svn-repo
         python3 -m pip install pyyaml
         python3 config_parser.py "publish-config.yml"
+      shell: bash
+
+    - name: Checkout SVN
+      env:
+        repo_url: ${{ fromJSON(steps.config-parser.outputs.pub_config).packages.url }}
+      run: |
+        echo "Checking out SVN repo at $repo_url"
+        svn co $repo_url
         ls -lthr
-        echo "$GITHUB_WORKSPACE"
         echo $PWD
       shell: bash
-    - name: "Action dir"
-      run: |
-        echo ${{ github.action_path }}
-      shell: bash
+      working-directory: "./temp-svn-repo"
