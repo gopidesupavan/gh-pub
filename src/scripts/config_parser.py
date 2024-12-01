@@ -8,13 +8,13 @@ DEFAULT_CHECK_SUM_SCRIPT = "{github_action_path}/src/scripts/checksum_check.sh"
 
 
 def set_default_config(config_data):
-    svn_checker_script = config_data.get("packages", {}).get("rules", {}).get("svn-check", {}).get("script")
+    svn_checker_script = config_data.get("publishers", {}).get("rules", {}).get("svn-check", {}).get("script")
     if not svn_checker_script:
-        config_data["packages"]["rules"]["svn-check"]["script"] = DEFAULT_SVN_CHECKER_SCRIPT.format(github_action_path=os.environ.get("GITHUB_ACTION_PATH"))
+        config_data["publishers"]["rules"]["svn-check"]["script"] = DEFAULT_SVN_CHECKER_SCRIPT.format(github_action_path=os.environ.get("GITHUB_ACTION_PATH"))
 
-    check_sum_script = config_data.get("packages", {}).get("rules", {}).get("checksum-check", {}).get("script")
+    check_sum_script = config_data.get("publishers", {}).get("rules", {}).get("checksum-check", {}).get("script")
     if not check_sum_script:
-        config_data["packages"]["rules"]["checksum-check"]["script"] = DEFAULT_CHECK_SUM_SCRIPT.format(github_action_path=os.environ.get("GITHUB_ACTION_PATH"))
+        config_data["publishers"]["rules"]["checksum-check"]["script"] = DEFAULT_CHECK_SUM_SCRIPT.format(github_action_path=os.environ.get("GITHUB_ACTION_PATH"))
 
     return config_data
 
