@@ -48,7 +48,8 @@ def check_files_with_identifiers(identifiers, all_files, check_type):
         unknown_files.extend(all_files_copy)
 
 if __name__ == "__main__":
-    # con = [{"id": "extension", "description": "Extension check", "identifiers": [{"type": "regex", "pattern": ".*(py3-none-any.whl|tar.gz.sha512|tar.gz.asc|tar.gz|py3-none-any.whl.asc|py3-none-any.whl.sha512)$"}]},{"id": "package_name", "description": "Package name check", "identifiers": [{"type": "regex", "pattern": ".*(apache_airflow.*)$"}, {"type": "regex", "pattern": ".*(apache-airflow.*)$"}]}]
+    #con = [{"id": "extension", "description": "Validate svn package extensions", "identifiers": [{"type": "regex", "pattern": ".*(py3-none-any.whl|tar.gz.sha512|tar.gz.asc|tar.gz|py3-none-any.whl.asc|py3-none-any.whl.sha512)$"}]}, {"id": "package_name", "description": "Validate svn package names", "identifiers": [{"type": "regex", "pattern": ".*(apache_airflow.*)$"}, {"type": "regex", "pattern": ".*(apache-airflow.*)$"}]}]
+
     svn_check_config = json.loads(os.environ.get("SVN_CHECK_CONFIG"))
 
     for check in svn_check_config:
