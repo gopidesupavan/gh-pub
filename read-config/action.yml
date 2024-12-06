@@ -19,7 +19,7 @@ runs:
       id: config-parser
       env:
         PUBLISH_CONFIG_FILE: ${{ inputs.publish-config }}
-        PUBLISH_CONFIG_SCHEMA: ${{ github.action_path }}/src/scripts/publish-config.schema.json
+        PUBLISH_CONFIG_SCHEMA: ${{ github.action_path }}/src/scripts/publish-config-schema.yml.schema.json
       run: |
         python3 -m pip install uv
         uv run $GITHUB_ACTION_PATH/src/scripts/config_parser.py
