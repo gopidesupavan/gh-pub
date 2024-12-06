@@ -63,6 +63,11 @@ def validate_config(yml_config):
 
 if __name__ == "__main__":
     yml_config_data = read_file(config_file)
+    console.print("[green]Publish config validation started[/]")
     validate_config(yml_config_data)
+    console.print("[green]Publish config validation passed[/]")
+    console.print("")
+    console.print("[green]Setting outputs[/]")
     set_outputs(yml_config_data)
+    console.print("[green]Outputs set[/]")
 
