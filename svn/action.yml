@@ -31,5 +31,5 @@ runs:
         SVN_CHECK_CONFIG: ${{ inputs.svn-config }}
       run: |
         python3 -m pip install uv
-        uv run $GITHUB_ACTION_PATH/src/scripts/svn.py
+        uv run $GITHUB_ACTION_PATH/src/scripts/svn_check.py
       working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"
