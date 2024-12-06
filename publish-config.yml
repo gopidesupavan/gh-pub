@@ -8,16 +8,19 @@ publisher:
 checks:
   svn:
     - id: extension
-      description: 'Extension check'
+      description: 'Validate svn package extensions'
       identifiers:
         - type: regex,
-          pattern: '.*'
+          pattern: ".*(py3-none-any.whl|tar.gz.sha512|tar.gz.asc|tar.gz|py3-none-any.whl.asc|py3-none-any.whl.sha512)$"
 
     - id: package_name
-      description: 'Package name check'
+      description: 'Validate svn package names'
       identifiers:
         - type: regex,
-          pattern: 'apache-airflow-providers-(.*?)-python3-none-any.whl'
+          pattern: ".*(apache_airflow.*)$"
+
+        - type: regex,
+          pattern: ".*(apache-airflow.*)$"
 
   checksum:
     - id: checksum

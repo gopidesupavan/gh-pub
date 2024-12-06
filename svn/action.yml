@@ -1,0 +1,23 @@
+name: 'Svn Validator'
+description: 'Validate svn files'
+inputs:
+  svn-config:
+    description: 'Json config for svn'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: "SVN validation"
+      shell: bash
+      id: svn-check
+      env:
+        SVN_CHECK_CONFIG: ${{ inputs.svn-config }}
+      run: |
+        python3 -m pip install uv
+        uv run $GITHUB_ACTION_PATH/src/scripts/svn.py

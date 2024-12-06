@@ -16,13 +16,15 @@ from rich.console import Console
 console = Console(width=400, color_system="standard")
 
 config_file = os.environ.get("PUBLISH_CONFIG_FILE")
-action_path = os.environ.get("GITHUB_ACTION_PATH")
+schema_path = os.environ.get("PUBLISH_CONFIG_SCHEMA")
+
 if not config_file:
     console.print(
         "[red]Error:  PUBLISH_CONFIG_FILE not set[/]\n"
         "You must set `PUBLISH_CONFIG_FILE` environment variable to run this script"
     )
     exit(1)
+os.environ['GITHUB_OUTPUT'] = "outputs.txt"
 
 
 def set_outputs(yml_config):
@@ -47,7 +49,7 @@ def read_file(path):
 def validate_config(yml_config):
     exit_code = 0
 
-    with open(f"{action_path}/src/scripts/publish-config-schema.yml.schema.json") as schema_file:
+    with open(schema_path) as schema_file:
         schema = json.loads(schema_file.read())
 
     validator = validator_for(schema)
@@ -65,6 +67,7 @@ if __name__ == "__main__":
     yml_config_data = read_file(config_file)
     console.print("[green]Publish config validation started[/]")
     validate_config(yml_config_data)
+    console.print("")
     console.print("[green]Publish config validation passed[/]")
     console.print("")
     console.print("[green]Setting outputs[/]")

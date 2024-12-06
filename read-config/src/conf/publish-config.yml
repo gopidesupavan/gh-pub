@@ -11,7 +11,7 @@ checks:
       description: 'Extension check'
       identifiers:
         - type: regex,
-          pattern: '.*'
+          pattern: '.*\.(tar\.gz|tar\.gz\.asc|tar\.gz\.sha512|py3-none-any\.whl|py3-none-any\.whl\.asc|py3-none-any\.whl\.sha512)'
 
     - id: package_name
       description: 'Package name check'
