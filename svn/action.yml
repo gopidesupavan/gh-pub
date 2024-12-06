@@ -4,6 +4,11 @@ inputs:
   svn-config:
     description: 'Json config for svn'
     required: true
+  temp-dir:
+    description: 'Checkout directory of svn repo'
+    required: false
+    default: 'temp-svn-repo'
+
 
 runs:
   using: "composite"
@@ -21,3 +26,4 @@ runs:
       run: |
         python3 -m pip install uv
         uv run $GITHUB_ACTION_PATH/src/scripts/svn.py
+      working-directory: "./${{ inputs.temp-dir }}"
