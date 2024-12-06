@@ -16,6 +16,7 @@ from rich.console import Console
 console = Console(width=400, color_system="standard")
 
 config_file = os.environ.get("PUBLISH_CONFIG_FILE")
+action_path = os.environ.get("GITHUB_ACTION_PATH")
 if not config_file:
     console.print(
         "[red]Error:  PUBLISH_CONFIG_FILE not set[/]\n"
@@ -46,7 +47,7 @@ def read_file(path):
 def validate_config(yml_config):
     exit_code = 0
 
-    with open("publish-config-schema.yml.schema.json") as schema_file:
+    with open(f"{action_path}/src/scripts/publish-config-schema.yml.schema.json") as schema_file:
         schema = json.loads(schema_file.read())
 
     validator = validator_for(schema)
