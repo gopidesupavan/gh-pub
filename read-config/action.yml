@@ -8,6 +8,10 @@ inputs:
 
 runs:
   using: "composite"
+  outputs:
+    publisher-url: ${{ steps.config-parser.outputs.publisher-url }}
+    publisher-path: ${{ steps.config-parser.outputs.publisher-path }}
+    checks-svn: ${{ steps.config-parser.outputs.checks-svn }}
   steps:
     - name: Setup Python
       uses: actions/setup-python@v4
