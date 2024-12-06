@@ -36,8 +36,8 @@ runs:
     - name: Checkout SVN
       shell: bash
       env:
-        repo_url: ${{ steps.config-parser.outputs.publisher-url}}
-        repo_path: ${{ steps.config-parser.outputs.publisher-path}}
+        repo_url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        repo_path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
       run: |
         echo "Checking out SVN repo at $repo_url/$repo_path"
         svn co $repo_url/$repo_path
