@@ -9,11 +9,12 @@ inputs:
     required: false
     default: 'temp-svn-repo'
   repo-path:
-    description: 'Path to the svn repo'
+    description: 'Path to the svn repo ex: airflow/providers/'
     required: true
   repo-url:
-    description: 'URL of the svn repo'
+    description: 'URL of the svn repo ex: https://dist.apache.org/repos/dist/release/airflow/'
     required: true
+
 
 
 runs:
