@@ -2,6 +2,8 @@
 # requires-python = ">=3.9"
 # dependencies = [
 #     "rich",
+#     "pyyaml",
+#     "jsonschema",
 # ]
 # ///
 import json
