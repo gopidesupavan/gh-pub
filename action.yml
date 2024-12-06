@@ -37,10 +37,9 @@ runs:
       shell: bash
       env:
         repo_url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
-        repo_path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
       run: |
-        echo "Checking out SVN repo at $repo_url/$repo_path"
-        svn co $repo_url/$repo_path
+        echo "Checking out SVN repo at $repo_url"
+        svn co $repo_url
         echo "SVN repo checked out"
       working-directory: "./${{ inputs.temp-dir }}"
 
@@ -49,3 +48,5 @@ runs:
       uses: gopidesupavan/gh-pub/svn@main
       with:
         svn-config: ${{ steps.config-parser.outputs.checks-svn }}
+        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}

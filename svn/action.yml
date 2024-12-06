@@ -8,6 +8,12 @@ inputs:
     description: 'Checkout directory of svn repo'
     required: false
     default: 'temp-svn-repo'
+  repo-path:
+    description: 'Path to the svn repo'
+    required: true
+  repo-url:
+    description: 'URL of the svn repo'
+    required: true
 
 
 runs:
@@ -26,4 +32,4 @@ runs:
       run: |
         python3 -m pip install uv
         uv run $GITHUB_ACTION_PATH/src/scripts/svn.py
-      working-directory: "./${{ inputs.temp-dir }}"
+      working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"
