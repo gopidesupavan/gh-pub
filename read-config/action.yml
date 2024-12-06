@@ -6,12 +6,19 @@ inputs:
     required: true
     default: 'publish-config.yml'
 
+outputs:
+  publisher-url:
+    value: ${{ steps.config-parser.outputs.publisher-url }}
+    description: "URL of the svn repo"
+  publisher-path:
+    value: ${{ steps.config-parser.outputs.publisher-path }}
+    description: "Path to the svn repo"
+  checks-svn:
+    value: ${{ steps.config-parser.outputs.checks-svn }}
+    description: "Config for svn checks"
+
 runs:
   using: "composite"
-  outputs:
-    publisher-url: ${{ steps.config-parser.outputs.publisher-url }}
-    publisher-path: ${{ steps.config-parser.outputs.publisher-path }}
-    checks-svn: ${{ steps.config-parser.outputs.checks-svn }}
   steps:
     - name: Setup Python
       uses: actions/setup-python@v4
