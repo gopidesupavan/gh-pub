@@ -21,4 +21,5 @@ runs:
         PUBLISH_CONFIG: ${{ inputs.publish-config }}
         GITHUB_ACTION_PATH: ${{ github.action_path }}
       run: |
+        python3 -m pip install uv
         uv run $GITHUB_ACTION_PATH/src/scripts/config_parser.py
