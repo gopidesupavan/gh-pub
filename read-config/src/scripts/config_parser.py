@@ -24,7 +24,6 @@ if not config_file:
         "You must set `PUBLISH_CONFIG_FILE` environment variable to run this script"
     )
     exit(1)
-os.environ['GITHUB_OUTPUT'] = "outputs.txt"
 
 
 def set_outputs(yml_config):
