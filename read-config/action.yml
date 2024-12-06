@@ -18,7 +18,7 @@ runs:
       shell: bash
       id: config-parser
       env:
-        PUBLISH_CONFIG: ${{ inputs.publish-config }}
+        PUBLISH_CONFIG_FILE: ${{ inputs.publish-config }}
         GITHUB_ACTION_PATH: ${{ github.action_path }}
       run: |
         python3 -m pip install uv
