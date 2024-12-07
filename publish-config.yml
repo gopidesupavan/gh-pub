@@ -24,8 +24,8 @@ checks:
 
   checksum:
     - id: checksum
-      description: 'SHA512 Check'
-      algorithm: '512'
+      description: 'Validate check sum with SHA512'
+      algorithm: 'sha512'
 
   signature:
     - id: signature

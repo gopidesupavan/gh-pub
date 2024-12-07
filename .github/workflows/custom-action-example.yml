@@ -55,3 +55,11 @@ jobs:
         svn-config: ${{ steps.config-parser.outputs.checks-svn }}
         repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
+
+     - name: "Checksum check"
+       id: "checksum-check"
+       uses: ./checksum
+       with:
+        checksum-config: ${{ steps.config-parser.outputs.checks-checksum }}
+        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}

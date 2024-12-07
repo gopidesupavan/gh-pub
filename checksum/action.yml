@@ -1,8 +1,8 @@
 name: 'Svn Validator'
 description: 'Validate svn files'
 inputs:
-  svn-config:
-    description: 'Json config for svn'
+  checksum-config:
+    description: 'Json config for checksum'
     required: true
   temp-dir:
     description: 'Checkout directory of svn repo'
@@ -24,12 +24,12 @@ runs:
       with:
         python-version: '3.9'
 
-    - name: "SVN validation"
+    - name: "Check sum validation"
       shell: bash
-      id: svn-check
+      id: check-sum
       env:
-        SVN_CHECK_CONFIG: ${{ inputs.svn-config }}
+        CHECK_SUM_CONFIG: ${{ inputs.checksum-config }}
       run: |
         python3 -m pip install uv
-        uv run $GITHUB_ACTION_PATH/svn_check.py
+        uv run $GITHUB_ACTION_PATH/checksum_check.py
       working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"
