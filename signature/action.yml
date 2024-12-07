@@ -1,8 +1,8 @@
-name: 'Checksum Validator'
-description: 'Validate checksum of packages'
+name: 'Signature Validator'
+description: 'Validate signature of packages'
 inputs:
-  checksum-config:
-    description: 'Json config for checksum'
+  signature-config:
+    description: 'Json config for signature validation'
     required: true
   temp-dir:
     description: 'Checkout directory of svn repo'
@@ -24,12 +24,12 @@ runs:
       with:
         python-version: '3.9'
 
-    - name: "Check sum validation"
+    - name: "Signature validation"
       shell: bash
-      id: check-sum
+      id: signature-check
       env:
-        CHECK_SUM_CONFIG: ${{ inputs.checksum-config }}
+        SIGNATURE_CHECK_CONFIG: ${{ inputs.signature-config }}
       run: |
         python3 -m pip install uv
-        uv run $GITHUB_ACTION_PATH/checksum_check.py
+        uv run $GITHUB_ACTION_PATH/signature_check.py
       working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"

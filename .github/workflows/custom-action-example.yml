@@ -63,3 +63,11 @@ jobs:
         checksum-config: ${{ steps.config-parser.outputs.checks-checksum }}
         repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
+
+     - name: "Signature check"
+       id: "signature-check"
+       uses: ./signature
+       with:
+        signature-config: ${{ steps.config-parser.outputs.checks-signature }}
+        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
