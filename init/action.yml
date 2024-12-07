@@ -1,4 +1,4 @@
-name: 'Svn checkout
+name: 'Svn checkout'
 description: 'Checkout svn repo'
 inputs:
   temp-dir:
