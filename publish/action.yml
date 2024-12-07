@@ -1,0 +1,50 @@
+name: "Publish to PyPI"
+description: "Publish packages to PyPI"
+inputs:
+  publish-config:
+    description: "Json config for publishing packages"
+    required: true
+  temp-dir:
+    description: "Checkout directory of svn repo"
+    required: false
+    default: "temp-svn-repo"
+  repo-path:
+    description: "Path to the svn repo ex: airflow/providers/"
+    required: true
+  repo-url:
+    description: "URL of the svn repo ex: https://dist.apache.org/repos/dist/release/airflow/"
+    required: true
+  mode:
+    description: "Mode to run the action, when set to 'release' it will publish to PyPI"
+    required: false
+    default: "verify"
+  publisher-name:
+    description: "Name of the publisher"
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: "Move release distributions to dist directory"
+      shell: bash
+      id: move-release-dists
+      env:
+        PUBLISH_PACKAGES_CONFIG: ${{ inputs.publish-config }}
+        SOURCE_PATH: ${{ github.workspace }}/${{ inputs.temp-dir }}/${{ inputs.repo-path }}
+        DIST_PATH: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist"
+      run: |
+        python3 -m pip install uv
+        uv run $GITHUB_ACTION_PATH/publish_packages.py
+      working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"
+
+    - name: "Publishing ${{ inputs.publisher-name }} release distributions to PyPI"
+      uses: pypa/gh-action-pypi-publish@release/v1
+      if: inputs.mode == 'RELEASE'
+      with:
+        packages-dir: dist/

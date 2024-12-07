@@ -15,13 +15,13 @@ from rich.console import Console
 
 console = Console(width=400, color_system="standard")
 
-config_file = os.environ.get("PUBLISH_CONFIG_FILE")
-schema_path = os.environ.get("PUBLISH_CONFIG_SCHEMA")
+config_file = os.environ.get("RELEASE_CONFIG_FILE")
+schema_path = os.environ.get("RELEASE_CONFIG_SCHEMA")
 
 if not config_file:
     console.print(
-        "[red]Error:  PUBLISH_CONFIG_FILE not set[/]\n"
-        "You must set `PUBLISH_CONFIG_FILE` environment variable to run this script"
+        "[red]Error:  RELEASE_CONFIG_FILE not set[/]\n"
+        "You must set `RELEASE_CONFIG_FILE` environment variable to run this script"
     )
     exit(1)
 
@@ -61,15 +61,15 @@ def validate_config(yml_config):
         console.print(f"[red]Error: {error}[/]")
 
     if exit_code:
-        console.print("[red]Publish config validation failed[/]")
+        console.print("[red]Release config validation failed[/]")
 
 
 if __name__ == "__main__":
     yml_config_data = read_file(config_file)
-    console.print("[green]Publish config validation started[/]")
+    console.print("[green]Release config validation started[/]")
     validate_config(yml_config_data)
     console.print("")
-    console.print("[green]Publish config validation passed[/]")
+    console.print("[green]Release config validation passed[/]")
     console.print("")
     console.print("[green]Setting outputs[/]")
     set_outputs(yml_config_data)
