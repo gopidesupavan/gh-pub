@@ -28,6 +28,12 @@ jobs:
        with:
          python-version: '3.11'
 
+     - name: "Config parser"
+       id: config-parser
+       uses: ./read-config
+       with:
+        publish-config: ${{ inputs.publish-config }}
+
      - name: "Checkout SVN"
        id: "svn-checkout"
        uses: ./init
@@ -35,12 +41,6 @@ jobs:
          temp-dir: ${{ inputs.temp-dir }}
          repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
          repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
-
-     - name: "Config parser"
-       id: config-parser
-       uses: ./read-config
-       with:
-        publish-config: ${{ inputs.publish-config }}
 
      - name: "Svn check"
        id: "svn-check"
