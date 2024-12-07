@@ -17,36 +17,30 @@ on:
         default: 'verify'
 
 jobs:
-  parser:
+  gh-action-pypi-publish:
     runs-on: ubuntu-latest
     steps:
      - name: Checkout Code
        uses: actions/checkout@v3
+
      - name: Setup Python
        uses: actions/setup-python@v4
        with:
-         python-version: '3.9'
+         python-version: '3.11'
 
-     - name: "Setup dir"
-       shell: bash
-       run: |
-          mkdir -p ${{ inputs.temp-dir }}
+     - name: "Checkout SVN"
+       id: "svn-checkout"
+       uses: ./init
+       with:
+         temp-dir: ${{ inputs.temp-dir }}
+         repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
 
      - name: "Config parser"
        id: config-parser
        uses: ./read-config
        with:
         publish-config: ${{ inputs.publish-config }}
-
-     - name: Checkout SVN
-       shell: bash
-       env:
-        repo_url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
-       run: |
-        echo "Checking out SVN repo at $repo_url"
-        svn co $repo_url
-        echo "SVN repo checked out"
-       working-directory: "./${{ inputs.temp-dir }}"
 
      - name: "Svn check"
        id: "svn-check"

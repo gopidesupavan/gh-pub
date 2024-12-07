@@ -29,7 +29,7 @@ checks:
 
   signature:
     - id: signature
-      description: 'Signature Check'
+      description: 'Validate signatures with GPG of packages'
       method: gpg
       keys: 'https://dist.apache.org/repos/dist/release/airflow/KEYS'
 

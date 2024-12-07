@@ -1,0 +1,32 @@
+name: 'Svn checkout
+description: 'Checkout svn repo'
+inputs:
+  temp-dir:
+    description: 'Checkout directory of svn repo'
+    required: false
+    default: 'temp-svn-repo'
+  repo-path:
+    description: 'Path to the svn repo ex: airflow/providers/'
+    required: true
+  repo-url:
+    description: 'URL of the svn repo ex: https://dist.apache.org/repos/dist/release/airflow/'
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Setup base"
+      shell: bash
+      run: |
+        mkdir -p ${{ inputs.temp-dir }}
+
+    - name: "Checkout svn repo ${{ inputs.repo-url }}"
+      shell: bash
+      env:
+        repo_url: ${{ inputs.repo-url }}
+      run: |
+        echo "Checking out SVN repo at $repo_url"
+        svn co $repo_url
+        echo "SVN repo checked out"
+      working-directory: "./${{ inputs.temp-dir }}"

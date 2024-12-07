@@ -15,6 +15,7 @@ import json
 import os
 import tempfile
 import gnupg
+
 svn_files = os.listdir()
 temp_signature_key_file_path = tempfile.NamedTemporaryFile().name
 
@@ -29,7 +30,7 @@ def download_keys(key_url):
     with open(temp_signature_key_file_path, "w") as key_file:
         key_file.write(response.text)
 
-def validate_signature(signature_check):
+def validate_signature_with_gpg(signature_check):
     key_url = signature_check.get("keys")
     download_keys(key_url)
     gpg = gnupg.GPG()
@@ -41,7 +42,7 @@ def validate_signature(signature_check):
             with open(file, "rb") as singed_file:
                 status = gpg.verify_file(fileobj_or_path=singed_file, data_filename=file.replace(".asc", ""))
             if not status.valid:
-                invalid_signature_files.append({"file": file, "status": status.status})
+                invalid_signature_files.append({"file": file, "status": status.valid, "problems": status.problems})
             else:
                 console.print(f"[blue]File {file} signed by {status.username}[/]")
 
@@ -52,12 +53,14 @@ if __name__ == "__main__":
     signature_check_config = json.loads(os.environ.get("SIGNATURE_CHECK_CONFIG"))
 
     for check in signature_check_config:
-        console.print(f"[blue]Checking {check.get('description')} signature[/]")
-        validate_signature(check)
+        console.print(f"[blue]{check.get('description')}[/]")
+        if check.get("method") == "gpg":
+            validate_signature_with_gpg(check)
+
 
     if invalid_signature_files:
         for error in invalid_signature_files:
-            console.print(f"[red]Error: Invalid signature found for {error.get('file')} status: {error.get('status')}[/]")
+            console.print(f"[red]Error: Invalid signature found for {error.get('file')} status: {error.get('status')} problems: {error.get('problems')}[/]")
         exit(1)
 
     console.print("[blue]All signatures are valid[/]")
