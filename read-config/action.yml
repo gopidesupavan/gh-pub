@@ -19,6 +19,9 @@ outputs:
   checks-checksum:
     value: ${{ steps.config-parser.outputs.checks-checksum }}
     description: "Config for checksum checks"
+  checks-signature:
+    value: ${{ steps.config-parser.outputs.checks-signature }}
+    description: "Config for signature checks"
 
 runs:
   using: "composite"
