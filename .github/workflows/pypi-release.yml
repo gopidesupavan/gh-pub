@@ -20,6 +20,8 @@ on:
 jobs:
   gh-action-pypi-publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     environment: test
     steps:
      - name: Checkout Code
@@ -45,8 +47,6 @@ jobs:
          repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
 
      - name: "Publish to PyPI"
-       permissions:
-         id-token: write
        id: "publish-to-pypi"
        uses: ./publish
        with:
