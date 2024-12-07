@@ -14,6 +14,7 @@ svn_files = os.listdir()
 
 invalid_checksums = []
 
+
 def validate_checksum(check_sum_files: list[dict[str, str]], algorithm: str):
     for file_dict in check_sum_files:
         sha_file, check_file = file_dict.values()
@@ -29,24 +30,30 @@ def validate_checksum(check_sum_files: list[dict[str, str]], algorithm: str):
         expected_sha = content.split()[0]
 
         if actual_sha != expected_sha:
-            invalid_checksums.append({
-                "file": sha_file,
-                "expected_sha": expected_sha,
-                "actual_sha": actual_sha
-            })
+            invalid_checksums.append(
+                {
+                    "file": sha_file,
+                    "expected_sha": expected_sha,
+                    "actual_sha": actual_sha,
+                }
+            )
+
 
 def get_valid_files(algorithm, files) -> list[dict[str, str]]:
     eligible_files = []
     for file in files:
         if file.endswith(algorithm):
-            eligible_files.append({
-                "sha_file": file,
-                "check_file": file.replace(algorithm, "").rstrip(".")
-            })
+            eligible_files.append(
+                {
+                    "sha_file": file,
+                    "check_file": file.replace(algorithm, "").rstrip("."),
+                }
+            )
     return eligible_files
 
+
 if __name__ == "__main__":
-    #con = [{"id": "checksum", "description": "SHA512 Check", "algorithm": "sha512"}]
+    # con = [{"id": "checksum", "description": "SHA512 Check", "algorithm": "sha512"}]
     check_sum_config = json.loads(os.environ.get("CHECK_SUM_CONFIG"))
 
     for check in check_sum_config:
@@ -63,7 +70,3 @@ if __name__ == "__main__":
         exit(1)
 
     console.print("[blue]Checksum validation passed[/]")
-
-
-
-

@@ -19,6 +19,7 @@ unknown_file_extensions = []
 valid_files = []
 failed_count_check = []
 
+
 def check_with_regex(file_to_check, pattern, check_type):
     match = re.match(pattern, file_to_check)
 
@@ -27,6 +28,7 @@ def check_with_regex(file_to_check, pattern, check_type):
 
     elif check_type == "package_name":
         return match and match.group(1) in file_to_check
+
 
 def check_files_with_identifiers(identifiers, all_files, check_type):
     all_files_copy = all_files.copy()
@@ -47,14 +49,17 @@ def check_files_with_identifiers(identifiers, all_files, check_type):
     elif check_type == "package_name":
         unknown_files.extend(all_files_copy)
 
+
 if __name__ == "__main__":
-    #con = [{"id": "extension", "description": "Validate svn package extensions", "identifiers": [{"type": "regex", "pattern": ".*(py3-none-any.whl|tar.gz.sha512|tar.gz.asc|tar.gz|py3-none-any.whl.asc|py3-none-any.whl.sha512)$"}]}, {"id": "package_name", "description": "Validate svn package names", "identifiers": [{"type": "regex", "pattern": ".*(apache_airflow.*)$"}, {"type": "regex", "pattern": ".*(apache-airflow.*)$"}]}]
+    # con = [{"id": "extension", "description": "Validate svn package extensions", "identifiers": [{"type": "regex", "pattern": ".*(py3-none-any.whl|tar.gz.sha512|tar.gz.asc|tar.gz|py3-none-any.whl.asc|py3-none-any.whl.sha512)$"}]}, {"id": "package_name", "description": "Validate svn package names", "identifiers": [{"type": "regex", "pattern": ".*(apache_airflow.*)$"}, {"type": "regex", "pattern": ".*(apache-airflow.*)$"}]}]
 
     svn_check_config = json.loads(os.environ.get("SVN_CHECK_CONFIG"))
 
     for check in svn_check_config:
         console.print(f"[blue]{check.get('description')}[/]")
-        check_files_with_identifiers(check.get("identifiers"), svn_files, check.get("id"))
+        check_files_with_identifiers(
+            check.get("identifiers"), svn_files, check.get("id")
+        )
 
     exit_code = 0
 
@@ -73,8 +78,3 @@ if __name__ == "__main__":
         exit(exit_code)
 
     console.print("[blue]SVN check passed successfully[/]")
-
-
-
-
-

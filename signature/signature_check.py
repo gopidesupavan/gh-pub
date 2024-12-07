@@ -6,29 +6,32 @@
 #     "python-gnupg",
 # ]
 # ///
+import gnupg
 import requests
 from rich.console import Console
-
-console = Console(width=400, color_system="standard")
-
-import json
 import os
 import tempfile
-import gnupg
+import json
+
+console = Console(width=400, color_system="standard")
 
 svn_files = os.listdir()
 temp_signature_key_file_path = tempfile.NamedTemporaryFile().name
 
 invalid_signature_files = []
 
+
 def download_keys(key_url):
     response = requests.get(key_url)
     if response.status_code != 200:
-        console.print(f"[red]Error: Unable to download signature file from {key_url}: received: {response.status_code}[/]")
+        console.print(
+            f"[red]Error: Unable to download signature file from {key_url}: received: {response.status_code}[/]"
+        )
         exit(1)
 
     with open(temp_signature_key_file_path, "w") as key_file:
         key_file.write(response.text)
+
 
 def validate_signature_with_gpg(signature_check):
     key_url = signature_check.get("keys")
@@ -40,13 +43,15 @@ def validate_signature_with_gpg(signature_check):
     for file in svn_files:
         if file.endswith(".asc"):
             with open(file, "rb") as singed_file:
-                status = gpg.verify_file(fileobj_or_path=singed_file, data_filename=file.replace(".asc", ""))
+                status = gpg.verify_file(
+                    fileobj_or_path=singed_file, data_filename=file.replace(".asc", "")
+                )
             if not status.valid:
-                invalid_signature_files.append({"file": file, "status": status.valid, "problems": status.problems})
+                invalid_signature_files.append(
+                    {"file": file, "status": status.valid, "problems": status.problems}
+                )
             else:
                 console.print(f"[blue]File {file} signed by {status.username}[/]")
-
-
 
 
 if __name__ == "__main__":
@@ -57,11 +62,11 @@ if __name__ == "__main__":
         if check.get("method") == "gpg":
             validate_signature_with_gpg(check)
 
-
     if invalid_signature_files:
         for error in invalid_signature_files:
-            console.print(f"[red]Error: Invalid signature found for {error.get('file')} status: {error.get('status')} problems: {error.get('problems')}[/]")
+            console.print(
+                f"[red]Error: Invalid signature found for {error.get('file')} status: {error.get('status')} problems: {error.get('problems')}[/]"
+            )
         exit(1)
 
     console.print("[blue]All signatures are valid[/]")
-

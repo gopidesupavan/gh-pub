@@ -28,13 +28,14 @@ if not config_file:
 
 def set_outputs(yml_config):
 
-    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    with open(os.environ["GITHUB_OUTPUT"], "a") as f:
         for root_element, root_values in yml_config.items():
             if isinstance(root_values, dict):
                 for key, value in root_values.items():
-                    f.write(f'{root_element}-{key}={json.dumps(value)}\n')
+                    f.write(f"{root_element}-{key}={json.dumps(value)}\n")
             else:
-                f.write(f'{root_element}={json.dumps(root_values)}\n')
+                f.write(f"{root_element}={json.dumps(root_values)}\n")
+
 
 def read_file(path):
     if path.endswith(".yml") or path.endswith(".yaml"):
@@ -44,6 +45,7 @@ def read_file(path):
     if path.endswith(".json"):
         with open(path) as file:
             return json.load(file)
+
 
 def validate_config(yml_config):
     exit_code = 0
@@ -72,4 +74,3 @@ if __name__ == "__main__":
     console.print("[green]Setting outputs[/]")
     set_outputs(yml_config_data)
     console.print("[green]Outputs set[/]")
-
