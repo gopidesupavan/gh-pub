@@ -17,5 +17,5 @@ jobs:
           python-version: '3.9'
       - name: "Run tests"
         run: |
-            python3 -m pip install uv pytest
+            python3 -m pip install uv pytest rich
             uv run pytest
