@@ -19,6 +19,7 @@ on:
 jobs:
   gh-action-pypi-publish:
     runs-on: ubuntu-latest
+    environment: test
     steps:
      - name: Checkout Code
        uses: actions/checkout@v3
