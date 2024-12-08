@@ -3,7 +3,7 @@ project:
   description: "Example project for publishing to PyPI"
 publisher:
   name: providers
-  url: "https://dist.apache.org/repos/dist/dev/airflow"
+  url: "https://dist.apache.org/repos/dist/release/airflow"
   path: "providers/"
 checks:
   svn:
