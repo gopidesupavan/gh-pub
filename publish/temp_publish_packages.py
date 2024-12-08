@@ -4,6 +4,7 @@
 #     "rich",
 # ]
 # ///
+
 import json
 import os
 import re
@@ -14,9 +15,7 @@ from rich.console import Console
 
 console = Console(width=400, color_system="standard")
 
-dist_path = os.environ.get("DIST_PATH")
-source_path = os.environ.get("SOURCE_PATH")
-
+# Create a temporary directory to checkout the release folder files from svn
 temp_svn_dist_release_dir = tempfile.TemporaryDirectory()
 
 svn_files = os.listdir()
@@ -56,7 +55,9 @@ def find_matched_packages_between_dev_and_release(
     # This package names contains all the packages without rc or based on regex pattern extracted name
     dev_package_names = extract_package_names(compare_config.get("package_names"))
     if not dev_package_names:
-        console.print(f"[red]No package names found to {source_path}[/]")
+        console.print(
+            f"[red]No package names found to {os.environ.get('SOURCE_PATH')}[/]"
+        )
         exit(1)
 
     release_folder_packages = os.listdir(path=temp_svn_dist_release_dir.name)
@@ -68,7 +69,7 @@ def find_matched_packages_between_dev_and_release(
 
     if not matched_packages:
         console.print(
-            f"[red]No matched packages found between {source_path} and {temp_svn_dist_release_dir.name}[/]"
+            f"[red]No matched packages found between {os.environ.get('SOURCE_PATH')} and {temp_svn_dist_release_dir.name}[/]"
         )
         exit(1)
     return matched_packages
@@ -101,13 +102,26 @@ def filter_rc_packages_to_publish(exclude_extensions_config: dict[str, Any]):
     final_packages_to_publish.extend(packages_to_publish)
 
 
-def move_packages_to_dist_folder():
+def move_packages_to_dist_folder(packages_path: str):
     if not final_packages_to_publish:
         console.print("[red]No packages found to publish[/]")
         exit(1)
 
     for package_name in final_packages_to_publish:
-        subprocess.run(["mv", package_name, dist_path])
+        full_path = os.path.join(packages_path, package_name)
+        subprocess.run(["mv", full_path, os.environ.get("DIST_PATH")])
+
+
+def filter_pypi_version_packages_to_publish(compare_config, extension_exclude_config):
+    # This package names contains all the packages without rc or based on regex pattern extracted name
+    release_matched_packages = find_matched_packages_between_dev_and_release(
+        compare_config
+    )
+    final_packages_to_publish.extend(
+        exclude_packages_to_publish(release_matched_packages, extension_exclude_config)
+    )
+    # For PYPI_VERSION release we move the packages from the release folder to dist folder, only matched packages will be moved to dist folder
+    move_packages_to_dist_folder(temp_svn_dist_release_dir.name)
 
 
 if __name__ == "__main__":
@@ -117,26 +131,21 @@ if __name__ == "__main__":
 
     if release_type == "RC_VERSION":
         filter_rc_packages_to_publish(extension_exclude_config)
-        move_packages_to_dist_folder()
+        # For RC release we can directly move the packages from the provided source path
+        move_packages_to_dist_folder(os.environ.get("SOURCE_PATH"))
 
     elif release_type == "PYPI_VERSION":
         compare_config = publish_config.get("compare")
         checkout_release_files(compare_config)
-        release_matched_packages = find_matched_packages_between_dev_and_release(
-            compare_config
+        filter_pypi_version_packages_to_publish(
+            compare_config, extension_exclude_config
         )
-        final_packages_to_publish.extend(
-            exclude_packages_to_publish(release_matched_packages, extension_exclude_config)
-        )
-        move_packages_to_dist_folder()
     else:
         console.print(f"[red]Invalid release type {release_type}[/]")
         exit(1)
 
-    console.print(
-        f"[blue]Following packages will be published to PyPI[/]"
-    )
+    console.print("[blue]Following packages will be published to PyPI[/]")
     for package in final_packages_to_publish:
         console.print(f"[blue]{package}[/]")
 
-    console.print(f"[blue]To publish these packages to PyPI, set the mode=RELEASE[/]")
+    console.print("[blue]To publish these packages to PyPI, set the mode=RELEASE[/]")

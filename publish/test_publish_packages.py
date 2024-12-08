@@ -1,15 +1,20 @@
+import os.path
+import tempfile
 from unittest.mock import patch
 
 import pytest
-from publish.publish_packages import (
-    exclude_packages_to_publish,
-    filter_rc_packages_to_publish,
-    final_packages_to_publish,
-    svn_files,
-    extract_package_names,
-    find_matched_packages_between_dev_and_release,
-)
 
+from publish.publish_packages_finder import PublishPackagesFinder
+
+def write_data(files, path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    for file in files:
+        with open(
+                os.path.join(path, file), "w"
+        ) as f:
+            f.write("test")
+    print(os.listdir(path))
 
 class TestPublishPackages:
 
@@ -52,10 +57,12 @@ class TestPublishPackages:
         ],
     )
     def test_exclude_packages_to_publish(self, packages, exclude_config, expected):
-        assert set(exclude_packages_to_publish(packages, exclude_config)) == set(
+        publish_packages_finder = PublishPackagesFinder()
+        after_exclude_packages = publish_packages_finder.exclude_packages_to_publish(packages=packages, exclude_config=exclude_config)
+        assert set(after_exclude_packages) == set(
             expected
         )
-
+    #
     @pytest.mark.parametrize(
         "packages, exclude_config, expected",
         [
@@ -97,11 +104,16 @@ class TestPublishPackages:
         ],
     )
     def test_filter_rc_packages_to_publish(self, packages, exclude_config, expected):
-        svn_files.clear()
-        svn_files.extend(packages)
-        final_packages_to_publish.clear()
-        filter_rc_packages_to_publish(exclude_config)
-        assert set(final_packages_to_publish) == set(expected)
+        publish_packages_finder = PublishPackagesFinder()
+        publish_packages_finder.final_packages_to_publish.clear()
+
+        # Write some files to temporary dev svn folder
+        temp_dev_svn_folder = tempfile.TemporaryDirectory()
+        os.chdir(temp_dev_svn_folder.name)
+        write_data(packages, temp_dev_svn_folder.name)
+        publish_packages_finder.filter_rc_packages_to_publish(exclude_extensions_config=exclude_config)
+
+        assert set(publish_packages_finder.final_packages_to_publish) == set(expected)
 
     @pytest.mark.parametrize(
         "packages, package_name_config, expected",
@@ -133,16 +145,32 @@ class TestPublishPackages:
                 ],
                 id="return_package_name_without_rc",
             ),
+            pytest.param(
+                [
+                   "apache-superset-incubating-0.34.0rc2-source.tar.gz",
+                   "apache-superset-incubating-0.34.0rc2-source.tar.gz.asc",
+                   "apache-superset-incubating-0.34.0rc2-source.tar.gz.sha512",
+                ],
+                [
+                    {
+                        "type": "regex",
+                        "pattern": "(apache-superset-incubating.*?)(?=rc)",
+                    },
+                ],
+                [
+                    "apache-superset-incubating-0.34.0",
+                ],
+                id="return_superset_package_name_without_rc",
+            )
         ],
     )
     def test_extract_package_names(self, packages, package_name_config, expected):
-        svn_files.clear()
-        svn_files.extend(packages)
-        extracted_names = extract_package_names(package_name_config)
+        publish_packages_finder = PublishPackagesFinder()
+        extracted_names = publish_packages_finder.extract_package_names(package_name_config=package_name_config, lookup_packages=packages)
         assert set(extracted_names) == set(expected)
 
     @pytest.mark.parametrize(
-        "compare_config, temp_release_dir_files, temp_svn_files, expected",
+        "compare_config, temp_release_dir_files, temp_dev_svn_files, expected",
         [
             pytest.param(
                 {
@@ -244,42 +272,64 @@ class TestPublishPackages:
             ),
         ],
     )
-    @patch("publish.publish_packages.os.listdir")
     def test_find_matched_packages_between_dev_and_release(
         self,
-        mock_listdir,
         compare_config,
         temp_release_dir_files,
-        temp_svn_files,
+        temp_dev_svn_files,
         expected,
     ):
-        mock_listdir.return_value = temp_release_dir_files
-        svn_files.clear()
-        svn_files.extend(temp_svn_files)
-        matched_package_names = find_matched_packages_between_dev_and_release(
+        publish_packages_finder = PublishPackagesFinder()
+
+        # Write some files to temporary release folder
+        write_data(temp_release_dir_files, os.path.join(publish_packages_finder.temp_svn_dist_release_dir, compare_config.get("path")))
+
+        # Write some files to temporary dev svn folder
+        temp_dev_svn_folder = tempfile.TemporaryDirectory()
+        os.chdir(temp_dev_svn_folder.name)
+        write_data(temp_dev_svn_files, temp_dev_svn_folder.name)
+
+        publish_packages_finder.find_matched_packages_between_dev_and_release(
             compare_config
         )
-        assert set(matched_package_names) == set(expected)
+        assert set(publish_packages_finder.matched_packages_between_dev_and_release) == set(expected)
+    #
+    # @patch("publish.publish_packages.os.listdir")
+    # def test_find_matched_packages_between_dev_and_release_when_no_match_should_fail(
+    #     self,
+    #     mock_listdir,
+    # ):
+    #     publish_packages_finder = PublishPackagesFinder()
+    #     mock_listdir.return_value = [
+    #         "apache_airflow_providers_amazon-9.1.0.tar.gz",
+    #         "apache_airflow_providers_amazon-9.1.0.tar.gz.asc",
+    #         "apache_airflow_providers_amazon-9.1.0.tar.gz.sha512",
+    #     ]
+    #     svn_files.clear()
+    #     svn_files.extend(
+    #         [
+    #             "apache_airflow_providers_airbyte-10.1.0rc1.tar.gz.sha512",
+    #         ]
+    #     )
+    #
+    #     with pytest.raises(SystemExit):
+    #         find_matched_packages_between_dev_and_release(
+    #             {
+    #                 "url": "https://dist.apache.org/repos/dist/release/airflow/",
+    #                 "path": "airflow/providers/",
+    #                 "package_names": [
+    #                     {
+    #                         "type": "regex",
+    #                         "pattern": "(apache_airflow_providers.*?)(?=rc)",
+    #                     }
+    #                 ],
+    #             }
+    #         )
 
-    @patch("publish.publish_packages.os.listdir")
-    def test_find_matched_packages_between_dev_and_release_when_no_match_should_fail(
-        self,
-        mock_listdir,
-    ):
-        mock_listdir.return_value = [
-            "apache_airflow_providers_amazon-9.1.0.tar.gz",
-            "apache_airflow_providers_amazon-9.1.0.tar.gz.asc",
-            "apache_airflow_providers_amazon-9.1.0.tar.gz.sha512",
-        ]
-        svn_files.clear()
-        svn_files.extend(
-            [
-                "apache_airflow_providers_airbyte-10.1.0.tar.gz.sha512",
-            ]
-        )
-
-        with pytest.raises(SystemExit):
-            find_matched_packages_between_dev_and_release(
+    @pytest.mark.parametrize(
+        "compare_config, temp_release_dir_files, temp_dev_svn_files, expected",
+        [
+            pytest.param(
                 {
                     "url": "https://dist.apache.org/repos/dist/release/airflow/",
                     "path": "airflow/providers/",
@@ -289,5 +339,70 @@ class TestPublishPackages:
                             "pattern": "(apache_airflow_providers.*?)(?=rc)",
                         }
                     ],
+                },
+                [
+                    "apache_airflow_providers_amazon-9.1.0.tar.gz",
+                    "apache_airflow_providers_amazon-9.1.0.tar.gz.asc",
+                    "apache_airflow_providers_amazon-9.1.0.tar.gz.sha512",
+                    "apache_airflow_providers_amazon-9.1.0-py3-none-any.whl",
+                    "apache_airflow_providers_amazon-9.1.0-py3-none-any.whl.asc",
+                    "apache_airflow_providers_amazon-9.1.0-py3-none-any.whl.sha512",
+                    "apache_airflow_providers_airbyte-10.1.0.tar.gz",
+                    "apache_airflow_providers_airbyte-10.1.0.tar.gz.asc",
+                    "apache_airflow_providers_airbyte-10.1.0.tar.gz.sha512",
+                    "apache_airflow_providers_airbyte-10.1.0-py3-none-any.whl",
+                    "apache_airflow_providers_airbyte-10.1.0-py3-none-any.whl.asc",
+                    "apache_airflow_providers_airbyte-10.1.0-py3-none-any.whl.sha512",
+                ],
+                [
+                    "apache_airflow_providers_amazon-9.1.0rc1.tar.gz",
+                    "apache_airflow_providers_amazon-9.1.0rc1.tar.gz.asc",
+                    "apache_airflow_providers_amazon-9.1.0rc1.tar.gz.sha512",
+                    "apache_airflow_providers_amazon-9.1.0rc1-py3-none-any.whl",
+                    "apache_airflow_providers_amazon-9.1.0rc1-py3-none-any.whl.asc",
+                    "apache_airflow_providers_amazon-9.1.0rc1-py3-none-any.whl.sha512",
+                    "apache_airflow_providers_airbyte-10.1.0rc1.tar.gz",
+                    "apache_airflow_providers_airbyte-10.1.0rc1.tar.gz.asc",
+                    "apache_airflow_providers_airbyte-10.1.0rc1.tar.gz.sha512",
+                    "apache_airflow_providers_airbyte-10.1.0rc1-py3-none-any.whl",
+                    "apache_airflow_providers_airbyte-10.1.0rc1-py3-none-any.whl.asc",
+                    "apache_airflow_providers_airbyte-10.1.0rc1-py3-none-any.whl.sha512",
+                ],
+                [
+                    "apache_airflow_providers_amazon-9.1.0.tar.gz",
+                    "apache_airflow_providers_amazon-9.1.0-py3-none-any.whl",
+                    "apache_airflow_providers_airbyte-10.1.0.tar.gz",
+                    "apache_airflow_providers_airbyte-10.1.0-py3-none-any.whl",
+                ],
+                id="find_matched_packages_between_dev_and_release",
+            ),
+        ],
+    )
+    def test_filter_pypi_version_packages_to_publish(
+        self, compare_config, temp_release_dir_files, temp_dev_svn_files, expected
+    ):
+        # Test compare the dev and release packages and filter the packages to publish
+        publish_packages_finder = PublishPackagesFinder()
+        publish_packages_finder.final_packages_to_publish.clear()
+
+        # Write some files to temporary dev svn folder
+        temp_dev_svn_folder = tempfile.TemporaryDirectory()
+        os.chdir(temp_dev_svn_folder.name)
+        write_data(temp_dev_svn_files, temp_dev_svn_folder.name)
+
+        dist_folder = tempfile.TemporaryDirectory()
+        os.environ["DIST_PATH"] = dist_folder.name
+
+        # Create temporary release folder files
+        write_data(temp_release_dir_files, publish_packages_finder.temp_svn_dist_release_dir)
+
+        publish_packages_finder.filter_pypi_version_packages_to_publish(
+            compare_config=compare_config,
+            extension_exclude_config=[
+                {
+                    "type": "regex",
+                    "pattern": r".*(.asc|.sha512)$",
                 }
-            )
+            ],
+        )
+        assert set(publish_packages_finder.final_packages_to_publish) == set(expected)

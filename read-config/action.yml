@@ -7,6 +7,9 @@ inputs:
     default: 'release-config.yml'
 
 outputs:
+  publisher-name:
+    value: ${{ steps.config-parser.outputs.publisher-name }}
+    description: "Name of the publisher eg: providers"
   publisher-url:
     value: ${{ steps.config-parser.outputs.publisher-url }}
     description: "URL of the svn repo"

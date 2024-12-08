@@ -40,5 +40,10 @@ runs:
         DIST_PATH: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist"
       run: |
         python3 -m pip install uv
-        uv run $GITHUB_ACTION_PATH/publish_packages.py
+        uv run $GITHUB_ACTION_PATH/publish_packages_finder.py.py
       working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"
+
+    - name: "Upload to ${{ inputs.publisher-name }} artifacts"
+      uses: actions/upload-artifact@v4
+      with:
+        path: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist/*"
