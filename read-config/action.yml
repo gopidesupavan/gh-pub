@@ -8,13 +8,13 @@ inputs:
 
 outputs:
   publisher-name:
-    value: ${{ steps.config-parser.outputs.publisher-name }}
+    value: ${{ fromJSON(steps.config-parser.outputs.publisher-name) }}
     description: "Name of the publisher eg: providers"
   publisher-url:
-    value: ${{ steps.config-parser.outputs.publisher-url }}
+    value: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
     description: "URL of the svn repo"
   publisher-path:
-    value: ${{ steps.config-parser.outputs.publisher-path }}
+    value: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
     description: "Path to the svn repo"
   checks-svn:
     value: ${{ steps.config-parser.outputs.checks-svn }}
@@ -35,7 +35,7 @@ runs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.11'
 
     - name: "Config parser"
       shell: bash

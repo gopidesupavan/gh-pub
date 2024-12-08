@@ -1,27 +1,59 @@
 name: "Publish to PyPI"
 description: "Publish packages to PyPI"
+
 inputs:
   publish-config:
-    description: "Json config for publishing packages"
+    description: >
+      Json config for publishing packages. it contains all the information required to publish the packages to PyPI. eg:
+      publish:
+        id: publish
+        description: "Publish provider packages to PyPI"
+        release-type: "RC_VERSION"
+        exclude_extensions:
+          - type: regex
+            pattern: ".*(.asc|.sha512)$"
+        compare:
+          url: "https://dist.apache.org/repos/dist/release/airflow/"
+          path: "providers/"
+          package_names:
+           - type: regex
+             pattern: "(apache_airflow_providers.*?)(?=rc)"
+      
+      release-type: RC_VERSION It will consider packages from dev/ folder and publish to PyPI.
+      release-type: PYPI_VERSION It will consider packages from release/ folder and publish to PyPI.
+      compare: Section contains the release packages, which is used to compare the packages in dev folder and only matching 
+      packages will be published to PyPI.
     required: true
   temp-dir:
-    description: "Checkout directory of svn repo"
+    description: >
+      Checkout directory of svn repo, this is used to checkout the svn repo.
     required: false
     default: "asf-dist"
-  repo-path:
-    description: "Path to the svn repo ex: airflow/providers/"
-    required: true
   repo-url:
-    description: "URL of the svn repo ex: https://dist.apache.org/repos/dist/release/airflow/"
+    description: >
+      URL of the svn repo ex: https://dist.apache.org/repos/dist/release/airflow/
+      this is used to checkout the svn repo.
+    required: true
+  repo-path:
+    description: >
+      Path to the svn repo. Lets say to publish the packages from the dev folder.
+      eg: svn repo structure is https://dist.apache.org/repos/dist/
+        dev/airflow/providers
+        release/airflow/providers
+      now to publish the packages from dev providers folder, set url and path like below in the release-config.yml
+      url: https://dist.apache.org/repos/dist/dev/airflow
+      repo-path: providers/
     required: true
   mode:
-    description: "Mode to run the action, when set to 'release' it will publish to PyPI"
+    description: >
+      Mode to run the action, The default mode is 'VERIFY' which will only verify the packages and displays the what will be published.
+      to publish the packages to PyPI set the mode to 'RELEASE'.
     required: false
     default: "VERIFY"
   publisher-name:
-    description: "Name of the publisher"
+    description: >
+      Name of the publisher eg: providers, this is used to name the steps in the workflow
     required: true
-
 
 runs:
   using: "composite"
@@ -38,14 +70,13 @@ runs:
         PUBLISH_PACKAGES_CONFIG: ${{ inputs.publish-config }}
         SOURCE_PATH: ${{ github.workspace }}/${{ inputs.temp-dir }}/${{ inputs.repo-path }}
         DIST_PATH: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist"
-        SVN_DIST_RELEASE_DIR: "${{ github.workspace }}/asf-dist-release"
         MODE: ${{ inputs.mode }}
       run: |
         python3 -m pip install uv
         uv run $GITHUB_ACTION_PATH/publish_packages_finder.py
       working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"
 
-    - name: "Upload to ${{ inputs.publisher-name }} artifacts"
+    - name: "Upload ${{ inputs.publisher-name }} to artifacts"
       uses: actions/upload-artifact@v4
       with:
         path: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist/*"
