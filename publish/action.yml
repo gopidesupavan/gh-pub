@@ -47,14 +47,3 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         path: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist/*"
-
-    - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
-      uses: actions/download-artifact@v4
-      with:
-        merge-multiple: true
-        path: ./dist
-
-    - name: "Verify release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
-      shell: bash
-      run: |
-        ls -lthr ./dist
