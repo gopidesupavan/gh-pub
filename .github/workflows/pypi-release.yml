@@ -62,6 +62,11 @@ jobs:
        with:
          path: ./dist
 
+     - name: "Verify release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
+       shell: bash
+       run: |
+         ls -ltr ./dist
+
      - name: "Publishing test release distributions to PyPI"
        uses: pypa/gh-action-pypi-publish@release/v1
        if: inputs.mode == 'RELEASE'
