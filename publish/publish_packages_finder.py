@@ -9,6 +9,7 @@ import json
 import os
 import re
 import subprocess
+import tempfile
 from functools import cached_property
 from typing import Any
 from rich.console import Console
@@ -26,6 +27,7 @@ class PublishPackagesFinder:
     final_packages_to_publish: list[str] = []
     matched_packages_between_dev_and_release: list[str] = []
     publish_config = json.loads(os.environ.get("PUBLISH_PACKAGES_CONFIG", "{}"))
+    temp_svn_dist_release_dir = tempfile.TemporaryDirectory()
 
     @cached_property
     def dev_svn_files(self):
@@ -33,7 +35,7 @@ class PublishPackagesFinder:
 
     @cached_property
     def svn_dist_release_dir(self):
-        return os.environ.get("SVN_DIST_RELEASE_DIR")
+        return self.temp_svn_dist_release_dir.name
 
     @staticmethod
     def is_extension_matched(file: str, pattern: str) -> bool:
@@ -153,7 +155,7 @@ class PublishPackagesFinder:
         console.print(
             f"[blue]Checking out files from {repo_url} to {path_to_checkout}[/]"
         )
-        subprocess.run(["git", "checkout", repo_url, path_to_checkout])
+        subprocess.run(["git", "clone", repo_url, path_to_checkout])
 
     def run(self):
         try:
