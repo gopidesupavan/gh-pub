@@ -43,19 +43,19 @@ jobs:
        uses: ./init
        with:
          temp-dir: ${{ inputs.temp-dir }}
-         repo-url: ${{ steps.config-parser.outputs.publisher-url }}
-         repo-path: ${{ steps.config-parser.outputs.publisher-path }}
+         repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path)}}
 
      - name: "Publish to PyPI"
        id: "publish-to-pypi"
        uses: ./publish
        with:
         publish-config: ${{ steps.config-parser.outputs.checks-publish }}
-        repo-url: ${{ steps.config-parser.outputs.publisher-url }}
-        repo-path: ${{ steps.config-parser.outputs.publisher-path }}
+        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path)}}
         temp-dir: ${{ inputs.temp-dir }}
         mode: ${{ inputs.mode }}
-        publisher-name: "test"
+        publisher-name: ${{ steps.config-parser.outputs.publisher-name }}
 
      - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
        uses: actions/download-artifact@v4
