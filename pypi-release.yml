@@ -46,15 +46,3 @@ runs:
        mode: ${{ inputs.mode }}
        publisher-name: ${{ fromJSON(steps.config-parser.outputs.publisher-name) }}
        repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
-
-   - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
-     uses: actions/download-artifact@v4
-     with:
-       merge-multiple: true
-       path: ./dist
-
-   - name: "Publishing ${{ steps.config-parser.outputs.publisher-name }} to PyPI"
-     uses: pypa/gh-action-pypi-publish@release/v1
-     if: inputs.mode == 'RELEASE'
-     with:
-       packages-dir: "./dist"
