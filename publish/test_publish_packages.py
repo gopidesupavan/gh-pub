@@ -282,7 +282,7 @@ class TestPublishPackages:
         publish_packages_finder = PublishPackagesFinder()
 
         # Write some files to temporary release folder
-        write_data(temp_release_dir_files, os.path.join(publish_packages_finder.temp_svn_dist_release_dir, compare_config.get("path")))
+        write_data(temp_release_dir_files, os.path.join(publish_packages_finder.svn_dist_release_dir, compare_config.get("path")))
 
         # Write some files to temporary dev svn folder
         temp_dev_svn_folder = tempfile.TemporaryDirectory()
@@ -394,7 +394,7 @@ class TestPublishPackages:
         os.environ["DIST_PATH"] = dist_folder.name
 
         # Create temporary release folder files
-        write_data(temp_release_dir_files, publish_packages_finder.temp_svn_dist_release_dir)
+        write_data(temp_release_dir_files, publish_packages_finder.svn_dist_release_dir)
 
         publish_packages_finder.filter_pypi_version_packages_to_publish(
             compare_config=compare_config,

@@ -9,7 +9,6 @@ import json
 import os
 import re
 import subprocess
-import tempfile
 from functools import cached_property
 from typing import Any
 from rich.console import Console
@@ -27,15 +26,14 @@ class PublishPackagesFinder:
     final_packages_to_publish: list[str] = []
     matched_packages_between_dev_and_release: list[str] = []
     publish_config = json.loads(os.environ.get("PUBLISH_PACKAGES_CONFIG", "{}"))
-    svn_release_dir = tempfile.TemporaryDirectory()
 
     @cached_property
     def dev_svn_files(self):
             return os.listdir()
 
     @cached_property
-    def temp_svn_dist_release_dir(self):
-        return self.svn_release_dir.name
+    def svn_dist_release_dir(self):
+        return os.environ.get("SVN_DIST_RELEASE_DIR")
 
     @staticmethod
     def is_extension_matched(file: str, pattern: str) -> bool:
@@ -56,6 +54,10 @@ class PublishPackagesFinder:
     @cached_property
     def extension_exclude_config(self):
         return self.publish_config.get("exclude_extensions")
+
+    @cached_property
+    def github_workspace(self):
+        return os.environ.get("GITHUB_WORKSPACE")
 
     @staticmethod
     def extract_package_names(package_name_config: list[dict[str, Any]], lookup_packages: list[str]):
@@ -87,7 +89,7 @@ class PublishPackagesFinder:
             exit(1)
 
         inner_path = compare_config.get("path")
-        path_to_lookup = os.path.join(self.temp_svn_dist_release_dir, inner_path)
+        path_to_lookup = os.path.join(self.svn_dist_release_dir, inner_path)
 
         release_folder_packages = os.listdir(path=path_to_lookup)
         self.matched_packages_between_dev_and_release = [
@@ -166,7 +168,7 @@ class PublishPackagesFinder:
 
                 compare_config = self.publish_config.get("compare")
                 repo_url = compare_config.get("url")
-                self.checkout_svn_repo(repo_url, self.temp_svn_dist_release_dir)
+                self.checkout_svn_repo(repo_url, self.svn_dist_release_dir)
                 self.filter_pypi_version_packages_to_publish(
                     compare_config, self.extension_exclude_config
                 )
@@ -174,7 +176,7 @@ class PublishPackagesFinder:
                 # For PYPI_VERSION release we move the packages from the release folder to dist folder,
                 # only matched packages between dev and release folder packages will be moved to dist folder for final publishing
 
-                self.move_packages_to_dist_folder(self.temp_svn_dist_release_dir)
+                self.move_packages_to_dist_folder(self.svn_dist_release_dir)
             else:
                 console.print(f"[red]Invalid release type {self.release_type}[/]")
                 exit(1)
