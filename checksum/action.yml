@@ -38,6 +38,7 @@ runs:
       shell: bash
       id: check-sum
       env:
+        REPO_PATH: ${{ inputs.repo-path }}
         CHECK_SUM_CONFIG: ${{ inputs.checksum-config }}
       run: |
         python3 -m pip install uv

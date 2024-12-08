@@ -35,6 +35,7 @@ runs:
       shell: bash
       id: signature-check
       env:
+        REPO_PATH: ${{ inputs.repo-path }}
         SIGNATURE_CHECK_CONFIG: ${{ inputs.signature-config }}
       run: |
         python3 -m pip install uv

@@ -6,6 +6,7 @@ inputs:
       Checkout directory of svn repo, this is used to checkout the svn repo.
     required: false
     default: "asf-dist"
+
   repo-url:
     description: >
       URL of the svn repo ex: https://dist.apache.org/repos/dist/release/airflow/
