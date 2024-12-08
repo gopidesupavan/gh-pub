@@ -51,6 +51,7 @@ runs:
     - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
       uses: actions/download-artifact@v4
       with:
+        merge-multiple: true
         path: ./dist
 
     - name: "Verify release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
