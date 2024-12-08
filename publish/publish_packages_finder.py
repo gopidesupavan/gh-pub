@@ -172,19 +172,23 @@ class PublishPackagesFinder:
                 )
 
                 # For PYPI_VERSION release we move the packages from the release folder to dist folder,
-                # only matched packages between dev and release folder will be moved to dist folder for final publishing
+                # only matched packages between dev and release folder packages will be moved to dist folder for final publishing
 
                 self.move_packages_to_dist_folder(self.temp_svn_dist_release_dir)
             else:
                 console.print(f"[red]Invalid release type {self.release_type}[/]")
                 exit(1)
 
-            console.print("[blue]Following packages will be published to PyPI[/]")
-
             for package in self.final_packages_to_publish:
                 console.print(f"[blue]{package}[/]")
+            console.print("\n")
 
-            console.print("[blue]To publish these packages to PyPI, set the mode=RELEASE in workflow and run[/]")
+            if os.environ.get("MODE") == "VERIFY":
+                console.print("[blue]To publish these packages to PyPI, set the mode=RELEASE in workflow and run[/]")
+            else:
+                console.print("[blue]Following packages will be published to PyPI[/]")
+
+
         except Exception as e:
             console.print(f"[red]Error: {e}[/]")
             exit(1)

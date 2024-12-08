@@ -15,7 +15,7 @@ on:
       mode:
         description: 'Mode to run the action'
         required: false
-        default: 'verify'
+        default: 'VERIFY'
 
 jobs:
   gh-action-pypi-publish:

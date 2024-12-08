@@ -36,13 +36,13 @@ checks:
   publish:
     id: publish
     description: "Publish provider packages to PyPI"
-    release-type: "RC_VERSION"
+    release-type: "PYPI_VERSION"
     exclude_extensions:
       - type: regex
         pattern: ".*(.asc|.sha512)$"
     compare:
       url: "https://github.com/gopidesupavan/backporting-test.git"
-      path: "dev/providers/"
+      path: "release/example/providers/"
       package_names:
        - type: regex
-         pattern: "(apache_airflow_providers.*?)(?=rc)"
+         pattern: "(sampleproject_pub.*?)(?=rc)"
