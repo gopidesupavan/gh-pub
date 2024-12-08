@@ -121,7 +121,9 @@ class PublishPackagesFinder:
                     if self.is_extension_matched(package, regex_pattern)
                 ]
         if exclude_packages:
-            console.print(f"[blue]Following packages excluded: {exclude_packages}[/]")
+            console.print(f"[blue]Following packages excluded: [/]")
+            console.print(f"[blue]{exclude_packages}[/]")
+            console.print("\n")
 
         return list(set(packages) - exclude_packages)
 
@@ -184,15 +186,13 @@ class PublishPackagesFinder:
                 console.print(f"[red]Invalid release type {self.release_type}[/]")
                 exit(1)
 
-            for package in self.final_packages_to_publish:
-                console.print(f"[blue]{package}[/]")
-            console.print("\n")
-
             if os.environ.get("MODE") == "VERIFY":
                 console.print("[blue]To publish these packages to PyPI, set the mode=RELEASE in workflow and run[/]")
             else:
                 console.print("[blue]Following packages will be published to PyPI[/]")
 
+            for package in self.final_packages_to_publish:
+                console.print(f"[blue]{package}[/]")
 
         except Exception as e:
             console.print(f"[red]Error: {e}[/]")
