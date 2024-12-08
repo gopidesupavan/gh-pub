@@ -60,3 +60,5 @@ jobs:
      - name: "Publishing test release distributions to PyPI"
        uses: pypa/gh-action-pypi-publish@release/v1
        if: inputs.mode == 'RELEASE'
+       with:
+         packages-dir: "${{ inputs.temp-dir }}/dist/"
