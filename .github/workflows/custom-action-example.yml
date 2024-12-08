@@ -3,37 +3,40 @@ name: Custom Release Publisher
 on:
   workflow_dispatch:
     inputs:
-      publish-config:
-        description: 'Path to the publish config file'
+      release-config:
+        description: "Path to the release config file"
         required: true
-        default: 'publish-config.yml'
+        default: "release-config.yml"
       temp-dir:
-        description: 'Temporary directory to checkout svn repo'
+        description: >
+          Checkout directory of svn repo, this is used to checkout the svn repo.
         required: false
-        default: 'temp-svn-repo'
+        default: "asf-dist"
       mode:
-        description: 'Mode to run the action'
+        description: "Mode to run the action"
         required: false
-        default: 'verify'
+        default: "VERIFY"
 
 jobs:
   gh-action-pypi-publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     environment: test
     steps:
      - name: Checkout Code
-       uses: actions/checkout@v3
+       uses: actions/checkout@v4
 
      - name: Setup Python
        uses: actions/setup-python@v4
        with:
-         python-version: '3.11'
+         python-version: "3.11"
 
      - name: "Config parser"
        id: config-parser
        uses: ./read-config
        with:
-        publish-config: ${{ inputs.publish-config }}
+        release-config: ${{ inputs.release-config }}
 
      - name: "Checkout svn ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}"
        id: "svn-checkout"
@@ -48,7 +51,7 @@ jobs:
        uses: ./svn
        with:
         svn-config: ${{ steps.config-parser.outputs.checks-svn }}
-        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        temp-dir: ${{ inputs.temp-dir }}
         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
 
      - name: "Checksum check"
@@ -56,7 +59,7 @@ jobs:
        uses: ./checksum
        with:
         checksum-config: ${{ steps.config-parser.outputs.checks-checksum }}
-        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        temp-dir: ${{ inputs.temp-dir }}
         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
 
      - name: "Signature check"
@@ -64,5 +67,27 @@ jobs:
        uses: ./signature
        with:
         signature-config: ${{ steps.config-parser.outputs.checks-signature }}
-        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+        temp-dir: ${{ inputs.temp-dir }}
         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
+
+     - name: "Find ${{ steps.config-parser.outputs.publisher-name }} packages"
+       id: "publish-to-pypi"
+       uses: ./publish
+       with:
+        publish-config: ${{ steps.config-parser.outputs.checks-publish }}
+        temp-dir: ${{ inputs.temp-dir }}
+        mode: ${{ inputs.mode }}
+        publisher-name: ${{ fromJSON(steps.config-parser.outputs.publisher-name) }}
+        repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
+
+     - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
+       uses: actions/download-artifact@v4
+       with:
+         merge-multiple: true
+         path: ./dist
+
+     - name: "Publishing ${{ steps.config-parser.outputs.publisher-name }} to PyPI"
+       uses: pypa/gh-action-pypi-publish@release/v1
+       if: inputs.mode == 'RELEASE'
+       with:
+         packages-dir: "./dist"

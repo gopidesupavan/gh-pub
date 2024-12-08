@@ -6,6 +6,8 @@
 #     "python-gnupg",
 # ]
 # ///
+from typing import Any
+
 import gnupg
 import requests
 from rich.console import Console
@@ -21,7 +23,7 @@ temp_signature_key_file_path = tempfile.NamedTemporaryFile().name
 invalid_signature_files = []
 
 
-def download_keys(key_url):
+def download_keys(key_url: str):
     response = requests.get(key_url)
     if response.status_code != 200:
         console.print(
@@ -33,8 +35,9 @@ def download_keys(key_url):
         key_file.write(response.text)
 
 
-def validate_signature_with_gpg(signature_check):
+def validate_signature_with_gpg(signature_check: dict[str, Any]):
     key_url = signature_check.get("keys")
+
     download_keys(key_url)
     gpg = gnupg.GPG()
     with open(temp_signature_key_file_path, "rb") as key_file:
@@ -55,7 +58,16 @@ def validate_signature_with_gpg(signature_check):
 
 
 if __name__ == "__main__":
-    signature_check_config = json.loads(os.environ.get("SIGNATURE_CHECK_CONFIG"))
+    signature_check_config: list[dict[str, Any]] = json.loads(
+        os.environ.get("SIGNATURE_CHECK_CONFIG")
+    )
+
+    if not signature_check_config:
+        console.print(
+            "[red]Error: SIGNATURE_CHECK_CONFIG not set[/]\n"
+            "You must set `SIGNATURE_CHECK_CONFIG` environment variable to run this script"
+        )
+        exit(1)
 
     for check in signature_check_config:
         console.print(f"[blue]{check.get('description')}[/]")

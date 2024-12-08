@@ -46,16 +46,15 @@ jobs:
          repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
          repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path)}}
 
-     - name: "Publish to PyPI"
+     - name: "Find ${{ steps.config-parser.outputs.publisher-name }} packages"
        id: "publish-to-pypi"
        uses: ./publish
        with:
-        publish-config: ${{ steps.config-parser.outputs.checks-publish }}
-        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
-        repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path)}}
-        temp-dir: ${{ inputs.temp-dir }}
-        mode: ${{ inputs.mode }}
-        publisher-name: ${{ steps.config-parser.outputs.publisher-name }}
+         publish-config: ${{ steps.config-parser.outputs.checks-publish }}
+         temp-dir: ${{ inputs.temp-dir }}
+         mode: ${{ inputs.mode }}
+         publisher-name: ${{ fromJSON(steps.config-parser.outputs.publisher-name) }}
+         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
 
      - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
        uses: actions/download-artifact@v4
@@ -63,12 +62,7 @@ jobs:
          merge-multiple: true
          path: ./dist
 
-     - name: "Verify release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
-       shell: bash
-       run: |
-         ls -lthr ./dist
-
-     - name: "Publishing test release distributions to PyPI"
+     - name: "Publishing ${{ steps.config-parser.outputs.publisher-name }} to PyPI"
        uses: pypa/gh-action-pypi-publish@release/v1
        if: inputs.mode == 'RELEASE'
        with:

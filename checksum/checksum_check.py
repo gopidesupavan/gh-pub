@@ -7,9 +7,12 @@
 import hashlib
 import json
 import os
+from typing import Any
+
 from rich.console import Console
 
 console = Console(width=400, color_system="standard")
+
 svn_files = os.listdir()
 
 invalid_checksums = []
@@ -39,7 +42,7 @@ def validate_checksum(check_sum_files: list[dict[str, str]], algorithm: str):
             )
 
 
-def get_valid_files(algorithm, files) -> list[dict[str, str]]:
+def get_valid_files(algorithm: str, files: list[str]) -> list[dict[str, str]]:
     eligible_files = []
     for file in files:
         if file.endswith(algorithm):
@@ -53,11 +56,19 @@ def get_valid_files(algorithm, files) -> list[dict[str, str]]:
 
 
 if __name__ == "__main__":
-    # con = [{"id": "checksum", "description": "SHA512 Check", "algorithm": "sha512"}]
-    check_sum_config = json.loads(os.environ.get("CHECK_SUM_CONFIG"))
+    check_sum_config: list[dict[str, Any]] = json.loads(
+        os.environ.get("CHECK_SUM_CONFIG")
+    )
+
+    if not check_sum_config:
+        console.print(
+            "[red]Error: CHECK_SUM_CONFIG not set[/]\n"
+            "You must set `CHECK_SUM_CONFIG` environment variable to run this script"
+        )
+        exit(1)
 
     for check in check_sum_config:
-        console.print(f"[blue]Checking {check.get('description')} checksum[/]")
+        console.print(f"[blue]{check.get('description')}[/]")
         valid_files = get_valid_files(check.get("algorithm"), svn_files)
         validate_checksum(valid_files, check.get("algorithm"))
 

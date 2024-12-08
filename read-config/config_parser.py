@@ -14,6 +14,7 @@ from jsonschema.validators import validator_for
 from rich.console import Console
 
 console = Console(width=400, color_system="standard")
+
 config_file = os.environ.get("RELEASE_CONFIG_FILE")
 schema_path = os.environ.get("RELEASE_CONFIG_SCHEMA")
 
@@ -65,11 +66,9 @@ def validate_config(yml_config):
 
 if __name__ == "__main__":
     yml_config_data = read_file(config_file)
-    console.print("[green]Release config validation started[/]")
+    console.print("[blue]Release config validation started[/]")
     validate_config(yml_config_data)
-    console.print("")
-    console.print("[green]Release config validation passed[/]")
-    console.print("")
-    console.print("[green]Setting outputs[/]")
+    console.print("[blue]Release config validation passed[/]")
+    console.print("[blue]Setting outputs[/]")
     set_outputs(yml_config_data)
-    console.print("[green]Outputs set[/]")
+    console.print("[blue]Outputs set[/]")

@@ -2,19 +2,26 @@ name: 'Signature Validator'
 description: 'Validate signature of packages'
 inputs:
   signature-config:
-    description: 'Json config for signature validation'
+    description: >
+      Json config for signature validation, it contains all the information required to validate the signature of the packages.
+      It does validation for the signature of the packages, all the packages should have valid.
     required: true
   temp-dir:
-    description: 'Checkout directory of svn repo'
+    description: >
+      Checkout directory of svn repo, this is used to checkout the svn repo.
     required: false
-    default: 'temp-svn-repo'
-  repo-path:
-    description: 'Path to the svn repo ex: airflow/providers/'
-    required: true
-  repo-url:
-    description: 'URL of the svn repo ex: https://dist.apache.org/repos/dist/release/airflow/'
-    required: true
+    default: "asf-dist"
 
+  repo-path:
+    description: >
+      Path to the svn repo. Lets say to publish the packages from the dev folder.
+      eg: svn repo structure is https://dist.apache.org/repos/dist/
+        dev/airflow/providers
+        release/airflow/providers
+      now to publish the packages from dev providers folder, set url and path like below in the release-config.yml
+      url: https://dist.apache.org/repos/dist/dev/airflow
+      repo-path: providers/
+    required: true
 
 runs:
   using: "composite"
@@ -22,7 +29,7 @@ runs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.11'
 
     - name: "Signature validation"
       shell: bash

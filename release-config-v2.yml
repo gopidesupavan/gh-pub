@@ -3,8 +3,8 @@ project:
   description: "Example project for publishing to PyPI"
 publisher:
   name: providers
-  url: "https://dist.apache.org/repos/dist/dev/airflow"
-  path: "providers/"
+  url: "https://github.com/gopidesupavan/backporting-test.git"
+  path: dev/example/providers/
 checks:
   svn:
     - id: extension
@@ -41,8 +41,8 @@ checks:
       - type: regex
         pattern: ".*(.asc|.sha512)$"
     compare:
-      url: "https://dist.apache.org/repos/dist/release/airflow/"
-      path: "providers/"
+      url: "https://github.com/gopidesupavan/backporting-test.git"
+      path: "release/example/providers/"
       package_names:
        - type: regex
-         pattern: "(apache_airflow_providers.*?)(?=rc)"
+         pattern: "(sampleproject_pub.*?)(?=rc)"
