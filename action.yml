@@ -1,4 +1,4 @@
-name: "composite example pypi publish
+name: "composite example pypi publish"
 description: 'Publish to PyPI'
 
 inputs:
