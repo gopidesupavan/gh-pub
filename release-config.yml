@@ -36,7 +36,7 @@ checks:
   publish:
     id: publish
     description: "Publish provider packages to PyPI"
-    release-type: "PYPI_VERSION"
+    release-type: "RC_VERSION"
     exclude_extensions:
       - type: regex
         pattern: ".*(.asc|.sha512)$"
