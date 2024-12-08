@@ -25,13 +25,13 @@ runs:
 
    - name: "Config parser"
      id: config-parser
-     uses: ./read-config
+     uses: gopidesupavan/gh-pub/read-config@main
      with:
       release-config: ${{ inputs.release-config }}
 
    - name: "Checkout svn ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}"
      id: "svn-checkout"
-     uses: ./init
+     uses: gopidesupavan/gh-pub/init@main
      with:
        temp-dir: ${{ inputs.temp-dir }}
        repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
@@ -39,7 +39,7 @@ runs:
 
    - name: "Find ${{ steps.config-parser.outputs.publisher-name }} packages"
      id: "publish-to-pypi"
-     uses: ./publish
+     uses: gopidesupavan/gh-pub/publish@main
      with:
        publish-config: ${{ steps.config-parser.outputs.checks-publish }}
        temp-dir: ${{ inputs.temp-dir }}
