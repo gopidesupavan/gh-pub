@@ -32,12 +32,29 @@ jobs:
        with:
          python-version: '3.11'
 
-     - name: "Execute custom action"
-       uses: gopidesupavan/gh-pub@main
+     - name: "Config parser"
+       id: config-parser
+       uses: ./read-config
        with:
-         release-config: ${{ inputs.release-config }}
+        release-config: ${{ inputs.release-config }}
+
+     - name: "Checkout svn ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}"
+       id: "svn-checkout"
+       uses: ./init
+       with:
+         temp-dir: ${{ inputs.temp-dir }}
+         repo-url: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path)}}
+
+     - name: "Find ${{ steps.config-parser.outputs.publisher-name }} packages"
+       id: "publish-to-pypi"
+       uses: ./publish
+       with:
+         publish-config: ${{ steps.config-parser.outputs.checks-publish }}
          temp-dir: ${{ inputs.temp-dir }}
          mode: ${{ inputs.mode }}
+         publisher-name: ${{ fromJSON(steps.config-parser.outputs.publisher-name) }}
+         repo-path: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
 
      - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
        uses: actions/download-artifact@v4
