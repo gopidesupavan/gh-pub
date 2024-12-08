@@ -151,7 +151,7 @@ class PublishPackagesFinder:
         console.print(
             f"[blue]Checking out files from {repo_url} to {path_to_checkout}[/]"
         )
-        subprocess.run(["svn", "checkout", repo_url, path_to_checkout])
+        subprocess.run(["git", "checkout", repo_url, path_to_checkout])
 
     def run(self):
         try:
