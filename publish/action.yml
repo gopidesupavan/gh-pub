@@ -42,9 +42,3 @@ runs:
         python3 -m pip install uv
         uv run $GITHUB_ACTION_PATH/publish_packages.py
       working-directory: "./${{ inputs.temp-dir }}/${{ inputs.repo-path }}"
-
-    - name: "Publishing ${{ inputs.publisher-name }} release distributions to PyPI"
-      uses: pypa/gh-action-pypi-publish@release/v1
-      if: inputs.mode == 'RELEASE'
-      with:
-        packages-dir: dist/
