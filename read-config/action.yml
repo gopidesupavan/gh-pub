@@ -8,13 +8,13 @@ inputs:
 
 outputs:
   publisher-name:
-    value: ${{ fromJSON(steps.config-parser.outputs.publisher-name) }}
+    value: ${{ toJSON(fromJSON(steps.config-parser.outputs.publisher-name)) }}
     description: "Name of the publisher eg: providers"
   publisher-url:
-    value: ${{ fromJSON(steps.config-parser.outputs.publisher-url) }}
+    value: ${{ toJSON(fromJSON(steps.config-parser.outputs.publisher-url)) }}
     description: "URL of the svn repo"
   publisher-path:
-    value: ${{ fromJSON(steps.config-parser.outputs.publisher-path) }}
+    value: ${{ toJSON(fromJSON(steps.config-parser.outputs.publisher-path)) }}
     description: "Path to the svn repo"
   checks-svn:
     value: ${{ steps.config-parser.outputs.checks-svn }}
