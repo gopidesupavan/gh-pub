@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "rich",
+# ]
+# ///
+
 import json
 import os
 import re
