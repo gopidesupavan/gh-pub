@@ -4,7 +4,7 @@ project:
 publisher:
   name: providers
   url: "https://github.com/gopidesupavan/backporting-test.git"
-  path: backporting-test/dev/example/providers/
+  path: dev/example/providers/
 checks:
   svn:
     - id: extension

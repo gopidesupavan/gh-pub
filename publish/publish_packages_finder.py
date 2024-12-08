@@ -45,6 +45,8 @@ class PublishPackagesFinder:
     @cached_property
     def dist_path(self):
         # Path where the final packages will be moved and pushed to artifactory
+        if not os.path.exists(os.environ.get("DIST_PATH")):
+            os.makedirs(os.environ.get("DIST_PATH"))
         return os.environ.get("DIST_PATH")
 
     @cached_property

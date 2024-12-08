@@ -4,7 +4,7 @@ inputs:
   temp-dir:
     description: 'Checkout directory of svn repo'
     required: false
-    default: 'temp-svn-repo'
+    default: "asf-dist"
   repo-path:
     description: 'Path to the svn repo ex: airflow/providers/'
     required: true
@@ -16,18 +16,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "Setup base"
-      shell: bash
-      run: |
-        mkdir -p ${{ inputs.temp-dir }}
-        mkdir -p ${{ inputs.temp-dir }}/dist
-
     - name: "Checkout svn repo ${{ inputs.repo-url }}"
       shell: bash
       env:
         repo_url: ${{ inputs.repo-url }}
       run: |
         echo "Checking out git repo at $repo_url"
-        git clone $repo_url
+        git clone $repo_url ./${{ inputs.temp-dir }}
         echo "git repo checked out"
-      working-directory: "./${{ inputs.temp-dir }}"
