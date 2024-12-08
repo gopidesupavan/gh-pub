@@ -20,6 +20,7 @@ runs:
       shell: bash
       run: |
         mkdir -p ${{ inputs.temp-dir }}
+        mkdir -p ${{ inputs.temp-dir }}/dist
 
     - name: "Checkout svn repo ${{ inputs.repo-url }}"
       shell: bash
