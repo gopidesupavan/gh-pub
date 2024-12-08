@@ -5,20 +5,6 @@ inputs:
   publish-config:
     description: >
       Json config for publishing packages. it contains all the information required to publish the packages to PyPI. eg:
-      publish:
-        id: publish
-        description: "Publish provider packages to PyPI"
-        release-type: "RC_VERSION"
-        exclude_extensions:
-          - type: regex
-            pattern: ".*(.asc|.sha512)$"
-        compare:
-          url: "https://dist.apache.org/repos/dist/release/airflow/"
-          path: "providers/"
-          package_names:
-           - type: regex
-             pattern: "(apache_airflow_providers.*?)(?=rc)"
-      
       release-type: RC_VERSION It will consider packages from dev/ folder and publish to PyPI.
       release-type: PYPI_VERSION It will consider packages from release/ folder and publish to PyPI.
       compare: Section contains the release packages, which is used to compare the packages in dev folder and only matching 
