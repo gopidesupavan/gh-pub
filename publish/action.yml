@@ -17,7 +17,7 @@ inputs:
   mode:
     description: "Mode to run the action, when set to 'release' it will publish to PyPI"
     required: false
-    default: "verify"
+    default: "VERIFY"
   publisher-name:
     description: "Name of the publisher"
     required: true
@@ -39,6 +39,7 @@ runs:
         SOURCE_PATH: ${{ github.workspace }}/${{ inputs.temp-dir }}/${{ inputs.repo-path }}
         DIST_PATH: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist"
         SVN_DIST_RELEASE_DIR: "${{ github.workspace }}/asf-dist-release"
+        MODE: ${{ inputs.mode }}
       run: |
         python3 -m pip install uv
         uv run $GITHUB_ACTION_PATH/publish_packages_finder.py
