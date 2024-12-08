@@ -7,7 +7,7 @@ inputs:
   temp-dir:
     description: "Checkout directory of svn repo"
     required: false
-    default: "temp-svn-repo"
+    default: "asf-dist"
   repo-path:
     description: "Path to the svn repo ex: airflow/providers/"
     required: true

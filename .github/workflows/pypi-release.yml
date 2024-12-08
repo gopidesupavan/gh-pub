@@ -11,7 +11,7 @@ on:
       temp-dir:
         description: 'Temporary directory to checkout svn repo'
         required: false
-        default: 'temp-svn-repo'
+        default: "asf-dist"
       mode:
         description: 'Mode to run the action'
         required: false
