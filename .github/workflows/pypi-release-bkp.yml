@@ -1,4 +1,4 @@
-name: Example pypi publish
+name: BKP Example pypi publish
 description: 'Publish to PyPI'
 
 on:
