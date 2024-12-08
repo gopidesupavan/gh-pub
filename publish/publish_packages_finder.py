@@ -178,7 +178,8 @@ class PublishPackagesFinder:
                 # For PYPI_VERSION release we move the packages from the release folder to dist folder,
                 # only matched packages between dev and release folder packages will be moved to dist folder for final publishing
 
-                self.move_packages_to_dist_folder(self.svn_dist_release_dir)
+                release_files_path = os.path.join(self.svn_dist_release_dir, compare_config.get("path"))
+                self.move_packages_to_dist_folder(release_files_path)
             else:
                 console.print(f"[red]Invalid release type {self.release_type}[/]")
                 exit(1)
