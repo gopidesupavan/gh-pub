@@ -18,7 +18,9 @@ on:
         default: 'VERIFY'
 
 jobs:
-  gh-action-pypi-publish:
+  release-checks:
+    outputs:
+      publisher-name: ${{ steps.config-parser.outputs.publisher-name }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -39,14 +41,27 @@ jobs:
          temp-dir: ${{ inputs.temp-dir }}
          mode: ${{ inputs.mode }}
 
-     - name: "Download release distributions for ${{ steps.config-parser.outputs.publisher-name }}"
-       uses: actions/download-artifact@v4
-       with:
-         merge-multiple: true
-         path: ./dist
 
-     - name: "Publishing ${{ steps.config-parser.outputs.publisher-name }} to PyPI"
-       uses: pypa/gh-action-pypi-publish@release/v1
-       if: inputs.mode == 'RELEASE'
-       with:
-         packages-dir: "./dist"
+  publish-to-pypi:
+    name: Publish svn packages to PyPI
+    runs-on: ubuntu-latest
+    needs:
+      - release-checks
+    environment:
+      name: test
+      url: https://pypi.org/project/pip/${{ github.ref_name }}
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - name: "Download release distributions for ${{ needs.release-checks.outputs.publisher-name }}"
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: ./dist
+
+      - name: "Publishing ${{ needs.release-checks.outputs.publisher-name }} to PyPI"
+        uses: pypa/gh-action-pypi-publish@release/v1
+        if: inputs.mode == 'RELEASE'
+        with:
+          packages-dir: "./dist"
