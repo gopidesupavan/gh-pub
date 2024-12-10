@@ -15,8 +15,9 @@ from jsonschema.validators import validator_for
 from rich.console import Console
 
 console = Console(width=200, color_system="standard")
-config_file = os.environ.get("RELEASE_CONFIG_FILE")
-schema_path = os.environ.get("RELEASE_CONFIG_SCHEMA")
+os.environ["GITHUB_OUTPUT"] = "/Users/pavangopidesu/Documents/RandomstuffWorkspace/Experiments/custom-actions/gh-svn-pypi-publisher/outputs.txt"
+config_file = "/Users/pavangopidesu/Documents/RandomstuffWorkspace/Experiments/custom-actions/gh-svn-pypi-publisher/release-config.yml"
+schema_path = "/Users/pavangopidesu/Documents/RandomstuffWorkspace/Experiments/custom-actions/gh-svn-pypi-publisher/read-config/release-config-schema.yml.schema.json"
 
 if not config_file:
     console.print(
@@ -39,7 +40,6 @@ def set_outputs(yml_config):
                 if isinstance(value, dict) or isinstance(value, list):
                     f.write(f"{root_element}-{key}={json.dumps(value)}\n")
                 else:
-                    print(f"{root_element}-{key}={value}")
                     f.write(f"{root_element}-{key}={value}\n")
 
 
