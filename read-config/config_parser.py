@@ -15,9 +15,8 @@ from jsonschema.validators import validator_for
 from rich.console import Console
 
 console = Console(width=200, color_system="standard")
-os.environ["GITHUB_OUTPUT"] = "/Users/pavangopidesu/Documents/RandomstuffWorkspace/Experiments/custom-actions/outputs.txt"
-config_file = "/Users/pavangopidesu/Documents/RandomstuffWorkspace/Experiments/custom-actions/gh-svn-pypi-publisher/release-config.yml"#os.environ.get("RELEASE_CONFIG_FILE")
-schema_path = "/Users/pavangopidesu/Documents/RandomstuffWorkspace/Experiments/custom-actions/gh-svn-pypi-publisher/read-config/release-config-schema.yml.schema.json"#os.environ.get("RELEASE_CONFIG_SCHEMA")
+config_file = os.environ.get("RELEASE_CONFIG_FILE")
+schema_path = os.environ.get("RELEASE_CONFIG_SCHEMA")
 
 if not config_file:
     console.print(
