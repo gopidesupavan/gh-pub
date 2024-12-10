@@ -36,7 +36,7 @@ def set_outputs(yml_config):
     with open(os.environ["GITHUB_OUTPUT"], "a") as f:
         for root_element, root_values in yml_config.items():
             for key, value in root_values.items():
-                if isinstance(value, dict):
+                if isinstance(value, dict) or isinstance(value, list):
                     f.write(f"{root_element}-{key}={json.dumps(value)}\n")
                 else:
                     print(f"{root_element}-{key}={value}")
