@@ -2,6 +2,7 @@ import os.path
 import tempfile
 
 import pytest
+from pytest_unordered import unordered
 
 from publish.publish_packages_finder import PublishPackagesFinder
 
@@ -12,11 +13,9 @@ def write_data(files, path):
     for file in files:
         with open(os.path.join(path, file), "w") as f:
             f.write("test")
-    print(os.listdir(path))
 
 
-class TestPublishPackages:
-
+class TestPublishPackagesFinder:
     @pytest.mark.parametrize(
         "packages, exclude_config, expected",
         [
@@ -60,7 +59,7 @@ class TestPublishPackages:
         after_exclude_packages = publish_packages_finder.exclude_packages_to_publish(
             packages=packages, exclude_config=exclude_config
         )
-        assert set(after_exclude_packages) == set(expected)
+        assert after_exclude_packages == unordered(expected)
 
     #
     @pytest.mark.parametrize(
@@ -111,11 +110,9 @@ class TestPublishPackages:
         temp_dev_svn_folder = tempfile.TemporaryDirectory()
         os.chdir(temp_dev_svn_folder.name)
         write_data(packages, temp_dev_svn_folder.name)
-        publish_packages_finder.filter_rc_packages_to_publish(
-            exclude_extensions_config=exclude_config
-        )
+        publish_packages_finder.filter_rc_packages_to_publish(exclude_extensions_config=exclude_config)
 
-        assert set(publish_packages_finder.final_packages_to_publish) == set(expected)
+        assert publish_packages_finder.final_packages_to_publish == unordered(expected)
 
     @pytest.mark.parametrize(
         "packages, package_name_config, expected",
@@ -171,7 +168,7 @@ class TestPublishPackages:
         extracted_names = publish_packages_finder.extract_package_names(
             package_name_config=package_name_config, lookup_packages=packages
         )
-        assert set(extracted_names) == set(expected)
+        assert extracted_names == unordered(expected)
 
     @pytest.mark.parametrize(
         "compare_config, temp_release_dir_files, temp_dev_svn_files, expected",
@@ -288,9 +285,7 @@ class TestPublishPackages:
         # Write some files to temporary release folder
         write_data(
             temp_release_dir_files,
-            os.path.join(
-                publish_packages_finder.svn_dist_release_dir, compare_config.get("path")
-            ),
+            os.path.join(publish_packages_finder.svn_dist_release_dir, compare_config.get("path")),
         )
 
         # Write some files to temporary dev svn folder
@@ -298,12 +293,8 @@ class TestPublishPackages:
         os.chdir(temp_dev_svn_folder.name)
         write_data(temp_dev_svn_files, temp_dev_svn_folder.name)
 
-        publish_packages_finder.find_matched_packages_between_dev_and_release(
-            compare_config
-        )
-        assert set(
-            publish_packages_finder.matched_packages_between_dev_and_release
-        ) == set(expected)
+        publish_packages_finder.find_matched_packages_between_dev_and_release(compare_config)
+        assert publish_packages_finder.matched_packages_between_dev_and_release == unordered(expected)
 
     def test_find_matched_packages_between_dev_and_release_when_no_match_should_fail(
         self,
@@ -318,7 +309,12 @@ class TestPublishPackages:
 
         temp_dev_svn_folder = tempfile.TemporaryDirectory()
         os.chdir(temp_dev_svn_folder.name)
-        write_data(["apache_airflow_providers-airbyte-9.1.0.tar.gz.sha512",], temp_dev_svn_folder.name)
+        write_data(
+            [
+                "apache_airflow_providers-airbyte-9.1.0.tar.gz.sha512",
+            ],
+            temp_dev_svn_folder.name,
+        )
 
         with pytest.raises(SystemExit):
             publish_packages_finder.find_matched_packages_between_dev_and_release(
@@ -413,4 +409,4 @@ class TestPublishPackages:
                 }
             ],
         )
-        assert set(publish_packages_finder.final_packages_to_publish) == set(expected)
+        assert publish_packages_finder.final_packages_to_publish == unordered(expected)

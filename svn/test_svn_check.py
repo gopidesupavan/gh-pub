@@ -1,7 +1,8 @@
 import pytest
+
 from svn.svn_check import (
-    check_with_regex,
     check_files_with_identifiers,
+    check_with_regex,
     unknown_file_extensions,
     unknown_files,
 )
@@ -67,7 +68,7 @@ def test_check_files_with_identifiers_for_extension():
     ]
     check_type = "extension"
     check_files_with_identifiers(identifiers, all_files, check_type)
-    assert unknown_file_extensions == []
+    assert not unknown_file_extensions
 
 
 def test_check_files_with_identifiers_for_invalid_extension():
@@ -103,7 +104,7 @@ def test_check_files_with_identifiers_for_package_name():
     identifiers = [{"type": "regex", "pattern": ".*(apache-airflow.*)$"}]
     check_type = "package_name"
     check_files_with_identifiers(identifiers, all_files, check_type)
-    assert unknown_files == []
+    assert not unknown_files
 
 
 def test_check_files_with_identifiers_for_invalid_package_name():
@@ -134,7 +135,7 @@ def test_check_files_with_multiple_identifiers_for_package_name():
     ]
     check_type = "package_name"
     check_files_with_identifiers(identifiers, all_files, check_type)
-    assert unknown_files == []
+    assert not unknown_files
 
 
 def test_check_files_with_multiple_identifiers_for_invalid_package_name():
