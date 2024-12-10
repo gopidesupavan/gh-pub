@@ -234,7 +234,7 @@ class PublishPackagesFinder:
     @staticmethod
     def checkout_svn_repo(repo_url: str, path_to_checkout: str):
         console.print(f"[blue]Checking out files from {repo_url} to {path_to_checkout}[/]")
-        subprocess.run(["svn", "co", repo_url, path_to_checkout], check=True)
+        subprocess.run(["git", "clone", repo_url, path_to_checkout], check=True)
 
     def run(self):
         try:
