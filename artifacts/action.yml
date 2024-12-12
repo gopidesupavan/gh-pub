@@ -1,5 +1,5 @@
-name: "Publish to PyPI"
-description: "Publish packages to PyPI"
+name: "Upload as artifacts"
+description: "Uploads the release distributions as artifacts"
 
 inputs:
   publish-config:
@@ -54,6 +54,46 @@ inputs:
       Name of the publisher eg: providers, this is used to name the steps in the workflow
     required: true
 
+  if-no-files-found:
+    description: >
+      The desired behavior if no files are found using the provided path.
+      
+      Available Options:
+        warn: Output a warning but do not fail the action
+        error: Fail the action with an error message
+        ignore: Do not output any warnings or errors, the action does not fail
+    default: 'warn'
+  retention-days:
+    description: >
+      Duration after which artifact will expire in days. 0 means using default retention.
+
+      Minimum 1 day.
+      Maximum 90 days unless changed from the repository settings page.
+    default: '5'
+  compression-level:
+    description: >
+      The level of compression for Zlib to be applied to the artifact archive.
+      The value can range from 0 to 9:
+      - 0: No compression
+      - 1: Best speed
+      - 6: Default compression (same as GNU Gzip)
+      - 9: Best compression
+      Higher levels will result in better compression, but will take longer to complete.
+      For large files that are not easily compressed, a value of 0 is recommended for significantly faster uploads.
+    default: '6'
+  overwrite:
+    description: >
+      If true, an artifact with a matching name will be deleted before a new one is uploaded.
+      If false, the action will fail if an artifact for the given name already exists.
+      Does not fail if the artifact does not exist.
+    default: 'false'
+
+  artifact-name:
+    description: >
+      Name of the artifact to be uploaded
+    required: false
+    default: "pypi-packages"
+
 runs:
   using: "composite"
   steps:
@@ -77,4 +117,9 @@ runs:
     - name: "Upload ${{ inputs.publisher-name }} to artifacts"
       uses: actions/upload-artifact@v4
       with:
+        name: ${{ inputs.artifact-name }}
         path: "${{ github.workspace }}/${{ inputs.temp-dir }}/dist/*"
+        retention-days: ${{ inputs.retention-days }}
+        if-no-files-found: ${{ inputs.if-no-files-found }}
+        compression-level: ${{ inputs.compression-level }}
+        overwrite: ${{ inputs.overwrite }}

@@ -86,12 +86,16 @@ class PublishPackagesFinder:
             if package_name_config.get("type") == "regex":
                 regex_pattern = package_name_config.get("pattern")
                 package_names.update(
-                    match.group(1) for file in lookup_packages if (match := re.match(regex_pattern, file))
+                    match.group(1)
+                    for file in lookup_packages
+                    if (match := re.match(regex_pattern, file))
                 )
 
         return list(package_names)
 
-    def find_matched_packages_between_dev_and_release(self, compare_config: dict[str, Any]):
+    def find_matched_packages_between_dev_and_release(
+        self, compare_config: dict[str, Any]
+    ):
         """
         Find the matched packages between dev and release folder based on the package names. the comparison works with config provided in compare
          section of the release config.
@@ -132,13 +136,19 @@ class PublishPackagesFinder:
         self.matched_packages_between_dev_and_release = [
             package
             for package in release_folder_packages
-            if any(package.startswith(package_name) for package_name in dev_package_names)
+            if any(
+                package.startswith(package_name) for package_name in dev_package_names
+            )
         ]
 
         if not self.matched_packages_between_dev_and_release:
-            svn_full_path = os.path.join(self.publish_config.get("compare").get("url"), inner_path).strip()
+            svn_full_path = os.path.join(
+                self.publish_config.get("compare").get("url"), inner_path
+            ).strip()
 
-            console.print(f"[red]No matched packages found between {os.getcwd()} and {svn_full_path}[/]")
+            console.print(
+                f"[red]No matched packages found between {os.getcwd()} and {svn_full_path}[/]"
+            )
             sys.exit(1)
 
     def exclude_packages_to_publish(
@@ -168,7 +178,9 @@ class PublishPackagesFinder:
 
         return list(set(packages) - exclude_packages)
 
-    def filter_rc_packages_to_publish(self, exclude_extensions_config: list[dict[str, Any]]):
+    def filter_rc_packages_to_publish(
+        self, exclude_extensions_config: list[dict[str, Any]]
+    ):
         """
         Filter the packages to publish based on the release type RC_VERSION, for rc release we directly consider
         packages from dev svn folder path provided in the release config
@@ -233,8 +245,10 @@ class PublishPackagesFinder:
 
     @staticmethod
     def checkout_svn_repo(repo_url: str, path_to_checkout: str):
-        console.print(f"[blue]Checking out files from {repo_url} to {path_to_checkout}[/]")
-        subprocess.run(["git", "clone", repo_url, path_to_checkout], check=True)
+        console.print(
+            f"[blue]Checking out files from {repo_url} to {path_to_checkout}[/]"
+        )
+        subprocess.run(["svn", "co", repo_url, path_to_checkout], check=True)
 
     def run(self):
         try:
@@ -249,12 +263,16 @@ class PublishPackagesFinder:
                 compare_config = self.publish_config.get("compare")
                 repo_url = compare_config.get("url")
                 self.checkout_svn_repo(repo_url, self.svn_dist_release_dir)
-                self.filter_pypi_version_packages_to_publish(compare_config, self.extension_exclude_config)
+                self.filter_pypi_version_packages_to_publish(
+                    compare_config, self.extension_exclude_config
+                )
 
                 # For PYPI_VERSION release we move the packages from the release folder to dist folder,
                 # only matched packages between dev and release folder packages will be moved to dist folder for final publishing
 
-                release_files_path = os.path.join(self.svn_dist_release_dir, compare_config.get("path"))
+                release_files_path = os.path.join(
+                    self.svn_dist_release_dir, compare_config.get("path")
+                )
                 self.move_packages_to_dist_folder(release_files_path)
             else:
                 console.print(f"[red]Invalid release type {self.release_type}[/]")
