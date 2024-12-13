@@ -28,6 +28,7 @@ console = Console(width=400, color_system="standard")
 
 class PublishPackagesFinder:
     final_packages_to_publish: list[str] = []
+
     matched_packages_between_dev_and_release: list[str] = []
     publish_config = json.loads(os.environ.get("PUBLISH_PACKAGES_CONFIG", "{}"))
     temp_svn_dist_release_dir = tempfile.TemporaryDirectory()

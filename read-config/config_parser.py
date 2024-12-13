@@ -14,6 +14,7 @@ import yaml
 from jsonschema.validators import validator_for
 from rich.console import Console
 
+
 console = Console(width=200, color_system="standard")
 config_file = os.environ.get("RELEASE_CONFIG_FILE")
 schema_path = os.environ.get("RELEASE_CONFIG_SCHEMA")
