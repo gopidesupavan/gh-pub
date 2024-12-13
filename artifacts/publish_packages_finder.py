@@ -35,15 +35,18 @@ class PublishPackagesFinder:
 
     @cached_property
     def dev_svn_files(self):
+
         return os.listdir()
 
     @cached_property
     def svn_dist_release_dir(self):
+
         return self.temp_svn_dist_release_dir.name
 
     @staticmethod
     def is_extension_matched(file: str, pattern: str) -> bool:
         match = re.match(pattern, file)
+
         return match and file.endswith(match.group(1))
 
     @cached_property
