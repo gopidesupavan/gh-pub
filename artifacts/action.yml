@@ -30,7 +30,6 @@ inputs:
       Checkout directory of svn repo, this is used to checkout the svn repo.
     required: false
     default: "asf-dist"
-
   repo-path:
     description: >
       Path to the svn repo. Lets say to publish the packages from the dev folder.
