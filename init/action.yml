@@ -35,4 +35,4 @@ runs:
         echo "Checking out SVN repo at $repo_url"
         svn co $repo_url ./${{ inputs.temp-dir }}
         echo "SVN repo checked out"
-        echo ls -lthr ./${{ inputs.temp-dir }}
+        ls -lthr ./${{ inputs.temp-dir }}
