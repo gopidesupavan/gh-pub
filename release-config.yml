@@ -1,10 +1,10 @@
 project:
-  name: example-project
-  description: "Example project for publishing to PyPI"
+  name: airflow-publish
+  description: "Publish airflow packages to PyPI"
 publisher:
-  name: providers
-  url: "https://dist.apache.org/repos/dist/release/airflow"
-  path: "providers/"
+  name: airflow
+  url: https://dist.apache.org/repos/dist/dev/airflow
+  path: "2.10.4rc1/"
 checks:
   svn:
     - id: extension
@@ -41,8 +41,8 @@ checks:
       - type: regex
         pattern: ".*(.asc|.sha512)$"
     compare:
-      url: "https://dist.apache.org/repos/dist/release/airflow/"
-      path: "providers/"
+      url: https://dist.apache.org/repos/dist/release/airflow/
+      path: "2.10.4"
       package_names:
        - type: regex
          pattern: "(apache_airflow_providers.*?)(?=rc)"
