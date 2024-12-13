@@ -1,0 +1,16 @@
+name: svn checkout
+on:
+  workflow_dispatch:
+jobs:
+  svn:
+    runs-on: ubuntu-latest
+    steps:
+     - name: Checkout SVN
+       env:
+         repo_url: "https://dist.apache.org/repos/dist/release/airflow/"
+       run: |
+         echo "svn-check"
+         svn co $repo_url
+         ls -lthr
+         echo "$GITHUB_WORKSPACE"
+         echo $PWD
