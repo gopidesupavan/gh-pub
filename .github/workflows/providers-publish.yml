@@ -1,5 +1,23 @@
-name: Tes gh-svn-pypi-publisher
-description: "Publish to PyPI"
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+---
+name: Dry run publish airflow provider packages
+description: "Publish or verify svn artifacts"
 
 on:
   workflow_dispatch:
@@ -7,48 +25,36 @@ on:
       release-config:
         description: "Path to the release config file"
         required: true
-        default: "release-config.yml"
+        default: "providers-rc-config.yml"
+        type: choice
+        options:
+          - "providers-rc-config.yml"
+          - "providers-pypi-config.yml"
       temp-dir:
         description: >
-          Checkout directory of svn repo, this is used to checkout the svn repo.
+          Temporary directory to checkout the svn repo.
         required: false
         default: "asf-dist"
       mode:
-        description: "Mode to run the action"
+        description: >
+          Mode to run the action, set mode to 'RELEASE' to publish the packages to PyPI.
         required: false
         default: "VERIFY"
       if-no-files-found:
         description: >
-          The desired behavior if no files are found using the provided path.
-  
-          Available Options:
-            warn: Output a warning but do not fail the action
-            error: Fail the action with an error message
-            ignore: Do not output any warnings or errors, the action does not fail
+          upload artifacts action behavior if no files are found using the provided path.
         default: 'warn'
       retention-days:
         description: >
           Duration after which artifact will expire in days. 0 means using default retention.
-  
-          Minimum 1 day.
-          Maximum 90 days unless changed from the repository settings page.
         default: '5'
       compression-level:
         description: >
-          The level of compression for Zlib to be applied to the artifact archive.
-          The value can range from 0 to 9:
-          - 0: No compression
-          - 1: Best speed
-          - 6: Default compression (same as GNU Gzip)
-          - 9: Best compression
-          Higher levels will result in better compression, but will take longer to complete.
-          For large files that are not easily compressed, a value of 0 is recommended for significantly faster uploads.
+          The level of compression for artifact upload.
         default: '6'
       overwrite:
         description: >
-          If true, an artifact with a matching name will be deleted before a new one is uploaded.
-          If false, the action will fail if an artifact for the given name already exists.
-          Does not fail if the artifact does not exist.
+          Overwrite the existing artifact with the same name.
         default: 'false'
 
       artifact-name:
@@ -56,8 +62,6 @@ on:
           The name of the artifact to be uploaded.
         required: false
         default: "pypi-packages"
-
-
 
 jobs:
   release-checks:
@@ -71,7 +75,7 @@ jobs:
          persist-credentials: false
 
      - name: Setup Python
-       uses: actions/setup-python@v4
+       uses: actions/setup-python@v5
        with:
          python-version: "3.11"
 
@@ -117,7 +121,7 @@ jobs:
        id: "upload-artifacts"
        uses: ./artifacts
        with:
-        publish-config: ${{ steps.config-parser.outputs.checks-publish }}
+        artifact-config: ${{ steps.config-parser.outputs.checks-artifact }}
         temp-dir: ${{ inputs.temp-dir }}
         mode: ${{ inputs.mode }}
         publisher-name: ${{ steps.config-parser.outputs.publisher-name }}
@@ -126,15 +130,14 @@ jobs:
         retention-days: ${{ inputs.retention-days }}
         compression-level: ${{ inputs.compression-level }}
         overwrite: ${{ inputs.overwrite }}
-
+        artifact-name: ${{ inputs.artifact-name }}
 
   publish-to-pypi:
     name: Publish svn packages to PyPI
     runs-on: ubuntu-20.04
+    if: inputs.mode == 'RELEASE' && success()
     needs:
       - release-checks
-    environment:
-      name: test
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -148,6 +151,5 @@ jobs:
 
       - name: "Publishing ${{ needs.release-checks.outputs.publisher-name }} to PyPI"
         uses: pypa/gh-action-pypi-publish@release/v1
-        if: inputs.mode == 'RELEASE'
         with:
           packages-dir: "./dist"

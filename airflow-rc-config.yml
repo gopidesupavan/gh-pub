@@ -1,10 +1,10 @@
 project:
-  name: airflow-publish
-  description: "Publish airflow packages to PyPI"
+  name: airflow
+  description: "Publish rc airflow packages to PyPI"
 publisher:
   name: airflow
   url: https://dist.apache.org/repos/dist/dev/airflow
-  path: "2.10.4rc1/"
+  path: 2.10.4rc1/
 checks:
   svn:
     - id: extension
@@ -33,16 +33,11 @@ checks:
       method: gpg
       keys: "https://dist.apache.org/repos/dist/release/airflow/KEYS"
 
-  publish:
-    id: publish
-    description: "Publish provider packages to PyPI"
-    release-type: "RC_VERSION"
-    exclude_extensions:
+  artifact:
+    id: artifact
+    description: "Find airflow artifacts to publish to PyPI"
+    exclude:
       - type: regex
         pattern: ".*(.asc|.sha512)$"
-    compare:
-      url: https://dist.apache.org/repos/dist/release/airflow/
-      path: "2.10.4"
-      package_names:
-       - type: regex
-         pattern: "(apache_airflow_providers.*?)(?=rc)"
+      - type: regex
+        pattern: "(apache-airflow-.*?)$"
