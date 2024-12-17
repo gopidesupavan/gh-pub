@@ -127,7 +127,7 @@ class PublishPackagesFinder:
     def run(self):
         try:
             console.print(f"[blue]{self.artifacts_config.get('description')}[/]")
-            console.print("\n")
+            console.print()
 
             self.final_packages_to_publish = self.exclude_packages_to_publish(
                 self.dev_svn_files, self.exclude_config
